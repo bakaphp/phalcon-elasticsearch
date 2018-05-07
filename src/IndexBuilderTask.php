@@ -10,7 +10,7 @@ use Phalcon\Queue\Beanstalk\Job;
  * This is the CLI to create you index based on this package
  *
  */
-class IndexTasksBuilder extends Task
+class IndexBuilderTask extends Task
 {
     /**
      * Main function

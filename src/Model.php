@@ -2,7 +2,7 @@
 
 namespace Baka\Elasticsearch;
 
-class BaseModel extends \Baka\Database\Model
+class Model extends \Baka\Database\Model
 {
     protected $elasticMaxDepth = 3;
 
