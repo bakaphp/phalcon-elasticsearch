@@ -122,6 +122,7 @@ class SearchController extends BaseController
 {
     use \Baka\Elasticsearch\SearchTrait
 }
+```
 
 And Follow the same query structure has Baka Http
 
