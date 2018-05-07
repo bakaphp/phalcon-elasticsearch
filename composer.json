@@ -1,6 +1,7 @@
 {
     "name": "baka/elasticsearch",
     "description": "Baka Elasticsearch component",
+    "license": "MIT",
     "authors": [
         {
             "name": "kaioken",
