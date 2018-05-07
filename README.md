@@ -130,11 +130,10 @@ And Follow the same query structure has Baka Http
 
 Example
 
-`https://api.dev/v1/search/users?sort=first_name|asc&q=(is_deleted:0,users_statuses_id:,first_name:,last_name:)&fields=id,first_name,last_name,potentiality,classification,userssprograms.id,events_satisfaction,is_prospect,gifts.name,is_key_users,dob,companies.name,companies.companiesstatuses.name,companies.rnc,position` 
-
-```
+`https://api.dev/v1/search/users?sort=first_name|asc&q=(is_deleted:0,users_statuses_id:,first_name:,last_name:)&fields=id,first_name,last_name,potentiality,classification,userssprograms.id,events_satisfaction,is_prospect,gifts.name,is_key_users,dob,companies.name,companies.companiesstatuses.name,companies.rnc,position`
 
 ## Testing
+
 ```
 codecept run
 ```
