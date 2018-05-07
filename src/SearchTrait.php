@@ -2,13 +2,13 @@
 
 namespace Baka\Elasticsearch;
 
-use \Phalcon\Http\Response;
+use Phalcon\Http\Response;
 use stdClass;
 
 /**
  * Search controller
  */
-class SearchTrait
+trait SearchTrait
 {
     /**
      * get the search by it id
@@ -17,7 +17,7 @@ class SearchTrait
      *
      * @return Response
      */
-    public function getById(string $model, bool $withLimit = true, $paramLimit = null)
+    public function getById(string $model, bool $withLimit = true, $paramLimit = null): Response
     {
         $query = $this->request->getQuery('q');
         $nestedQuery = $this->request->getQuery('nq');
@@ -178,7 +178,7 @@ class SearchTrait
      * @param  array $args
      * @return array
      */
-    public function orderBy($data, $args): array
+    protected function orderBy($data, $args): array
     {
         /**
          * naveget the response and sort it by the field
@@ -219,7 +219,7 @@ class SearchTrait
      *
      * @return     \stdClass
      */
-    protected function paginate($items, $totalItems, $page, $offset, $limit)
+    protected function paginate($items, $totalItems, $page, $offset, $limit): stdClass
     {
         $limit = (int) $limit;
         $offset = (int) $offset;
@@ -255,7 +255,7 @@ class SearchTrait
      * @param  string $unparsed
      * @return array
      */
-    protected function parseSearchParameters($unparsed)
+    protected function parseSearchParameters($unparsed): array
     {
         // $unparsed = urldecode($unparsed);
         // Strip parens that come with the request string
