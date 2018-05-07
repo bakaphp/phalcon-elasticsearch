@@ -12,7 +12,8 @@
         "php": ">=7.0",
         "ext-phalcon": ">=3.0.0",
         "vlucas/phpdotenv": "^2.0",
-        "phalcon/incubator": "~3.0",
+        "phalcon/incubator": "~3.3",
+        "monolog/monolog": "^1.16",
         "baka/database": "dev-master",
         "elasticsearch/elasticsearch": "~2.0@beta"
     },
