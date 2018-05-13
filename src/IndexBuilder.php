@@ -8,7 +8,7 @@ use \Exception;
 use \Phalcon\Db\Column;
 use \Phalcon\Mvc\Model;
 
-class Elasticsearch
+class IndexBuilder
 {
     /**
      * @var \Phalcon\Di
