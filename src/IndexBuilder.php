@@ -2,7 +2,8 @@
 
 namespace Baka\Elasticsearch;
 
-use \Baka\Crud\Models\Baka;
+use \Baka\Database\ModelCustomFields;
+use \Baka\Database\CustomFields;
 use \Elasticsearch\ClientBuilder as Client;
 use \Exception;
 use \Phalcon\Db\Column;
@@ -179,7 +180,7 @@ class IndexBuilder
         self::initialize();
 
         // Start the document we are going to insert by convertin the object to an array.
-        $document = Baka::getCustomFields($object, true);
+        $document = ModelCustomFields::getCustomFields($object, true);
 
         // Use reflection to extract neccessary information from the object.
         $modelReflection = (new \ReflectionClass($object));
@@ -336,7 +337,7 @@ class IndexBuilder
     {
         $modelPath = explode('\\', $modelPath);
         $modelName = end($modelPath);
-        $customFields = \Baka\Crud\Models\CustomFields::getFields($modelName);
+        $customFields = CustomFields::getFields($modelName);
 
         if (!is_null($customFields)) {
             $params['custom_fields'] = ['type' => 'nested'];
@@ -395,7 +396,7 @@ class IndexBuilder
                     $aliasRecords = $data->$alias('is_deleted = 0');
 
                     if ($aliasRecords) {
-                        $document[$aliasKey] = Baka::getCustomFields($aliasRecords, true);
+                        $document[$aliasKey] = ModelCustomFields::getCustomFields($aliasRecords, true);
 
                         if ($depth < $maxDepth) {
                             self::getRelatedData($document[$aliasKey], $aliasRecords, $parentModel, $depth, $maxDepth);
@@ -419,7 +420,7 @@ class IndexBuilder
 
                     if (count($aliasRecords) > 0) {
                         foreach ($aliasRecords as $k => $relation) {
-                            $document[$aliasKey][$k] = Baka::getCustomFields($relation, true);
+                            $document[$aliasKey][$k] = ModelCustomFields::getCustomFields($relation, true);
 
                             if ($depth < $maxDepth) {
                                 self::getRelatedData($document[$aliasKey][$k], $relation, $parentModel, $depth, $maxDepth);
