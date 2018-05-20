@@ -3,7 +3,7 @@
 namespace Baka\Elasticsearch;
 
 use \Baka\Database\ModelCustomFields;
-use \Baka\Database\CustomFields;
+use \Baka\Database\CustomFields\CustomFields;
 use \Elasticsearch\ClientBuilder as Client;
 use \Exception;
 use \Phalcon\Db\Column;

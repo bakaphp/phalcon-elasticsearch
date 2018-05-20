@@ -17,13 +17,13 @@
         "monolog/monolog": "^1.16",
         "baka/database": "dev-master",
         "baka/http": "dev-master",
-        "elasticsearch/elasticsearch": "~2.0@beta"
+        "elasticsearch/elasticsearch": "^2.3.1"
     },
     "require-dev": {
         "codeception/verify": "*",
         "vlucas/phpdotenv": "^2.0",
         "phalcon/incubator": "dev-master",
-        "elasticsearch/elasticsearch": "~2.0@beta"
+        "elasticsearch/elasticsearch": "^2.3.1"
     },
     "autoload": {
         "psr-4": {

@@ -17,7 +17,7 @@ trait SearchTrait
      *
      * @return Response
      */
-    public function getById(string $model, bool $withLimit = true, $paramLimit = null): Response
+    public function search(string $model, bool $withLimit = true, $paramLimit = null): Response
     {
         $query = $this->request->getQuery('q');
         $nestedQuery = $this->request->getQuery('nq');

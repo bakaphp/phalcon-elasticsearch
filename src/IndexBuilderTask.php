@@ -133,6 +133,7 @@ class IndexBuilderTask extends Task
                         $elasticsearch->indexDocument($record, $maxDepth);
                     }
                 } catch (Throwable $e) {
+                    echo $e->getMessage();
                     $this->log->error($e->getMessage());
                 }
 
