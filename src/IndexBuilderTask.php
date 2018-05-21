@@ -5,6 +5,7 @@ namespace Baka\Elasticsearch;
 use Phalcon\Cli\Task;
 use Phalcon\Queue\Beanstalk\Extended as BeanstalkExtended;
 use Phalcon\Queue\Beanstalk\Job;
+use Throwable;
 
 /**
  * This is the CLI to create you index based on this package
@@ -133,8 +134,8 @@ class IndexBuilderTask extends Task
                         $elasticsearch->indexDocument($record, $maxDepth);
                     }
                 } catch (Throwable $e) {
-                    echo $e->getMessage();
-                    $this->log->error($e->getMessage());
+                    echo $e->getTraceAsString();
+                    $this->log->error($e->getTraceAsString());
                 }
 
                 // It's very important to send the right exit code!

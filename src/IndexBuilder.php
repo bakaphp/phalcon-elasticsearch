@@ -387,6 +387,15 @@ class IndexBuilder
             $referencedModel = $has->getReferencedModel();
 
             if ($referencedModel != $parentModel) {
+                $options = $has->getOptions();
+
+                //ignore a relationship if we specify so
+                if (array_key_exists('elasticSearch', $options)) {
+                    if (!$options['elasticSearch']) {
+                        continue;
+                    }
+                }
+
                 $alias = $has->getOptions()['alias'];
                 $aliasKey = strtolower($alias);
 
@@ -410,6 +419,15 @@ class IndexBuilder
             $referencedModel = $has->getReferencedModel();
 
             if ($referencedModel != $parentModel) {
+                $options = $has->getOptions();
+
+                //ignore a relationship if we specify so
+                if (array_key_exists('elasticSearch', $options)) {
+                    if (!$options['elasticSearch']) {
+                        continue;
+                    }
+                }
+
                 $alias = $has->getOptions()['alias'];
                 $aliasKey = strtolower($alias);
 

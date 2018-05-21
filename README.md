@@ -75,6 +75,7 @@ Level 3
  - - - - Class C
  - - - - - Relation HasMany Class D
 ``` 
+*We can ignore a relationship if we specify on the options `'elasticSearch' => false`*
 
 I wont recommend going beyond 4 levels if it not neede, it will use a lot of space.
 
