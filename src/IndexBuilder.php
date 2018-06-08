@@ -287,6 +287,13 @@ class IndexBuilder
             if ($referencedModel != $parentModel) {
                 $referencedModel = new $referencedModel();
 
+                //ignore properies we dont need right now
+                if (array_key_exists('elasticSearch', $relation->getOptions())) {
+                    if (!$relation->getOptions()['elasticSearch']) {
+                        continue;
+                    }
+                }
+
                 $alias = strtolower($relation->getOptions()['alias']);
                 $params[$alias] = ['type' => 'nested'];
 
