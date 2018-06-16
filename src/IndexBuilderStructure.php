@@ -62,9 +62,11 @@ class IndexBuilderStructure extends IndexBuilder
         $modelReflection = (new \ReflectionClass($object));
         $document = $object->document();
 
+        $indexName = is_null(static::$indexName) ? strtolower($modelReflection->getShortName()) : static::$indexName;
+
         $params = [
-            'index' => strtolower($modelReflection->getShortName()),
-            'type' => strtolower($modelReflection->getShortName()),
+            'index' => $indexName,
+            'type' => $indexName,
             'id' => $object->getId(),
             'body' => $document,
         ];
@@ -87,9 +89,11 @@ class IndexBuilderStructure extends IndexBuilder
         $modelReflection = (new \ReflectionClass($object));
         $object->document();
 
+        $indexName = is_null(static::$indexName) ? strtolower($modelReflection->getShortName()) : static::$indexName;
+
         $params = [
-            'index' => strtolower($modelReflection->getShortName()),
-            'type' => strtolower($modelReflection->getShortName()),
+            'index' => $indexName,
+            'type' => $indexName,
             'id' => $object->getId(),
         ];
 
@@ -104,7 +108,7 @@ class IndexBuilderStructure extends IndexBuilder
      */
     public static function setIndexName(string $indexName): void
     {
-        self::$indexName = strtolower($indexName);
+        static::$indexName = strtolower($indexName);
     }
 
     /**

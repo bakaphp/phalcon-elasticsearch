@@ -15,7 +15,7 @@ class IndicesTest extends PhalconUnitTestCase
         $elasticsearch = new IndexBuilderStructure();
 
         $indices = new Indices();
-        $elasticsearch->createIndices('Indices');
+        $elasticsearch::createIndices('Indices');
     }
 
     /**
@@ -28,12 +28,12 @@ class IndicesTest extends PhalconUnitTestCase
         $elasticsearch = new IndexBuilderStructure();
 
         $indices = new Indices();
-        $elasticsearch->setIndexName('MyManualIndexName');
-        $elasticsearch->createIndices('Indices');
+        $elasticsearch::setIndexName('MyManualIndexName');
+        $elasticsearch::createIndices('Indices');
     }
 
     /**
-     * Inset document test
+     * Inset document test normal
      *
      * @return void
      */
@@ -41,8 +41,21 @@ class IndicesTest extends PhalconUnitTestCase
     {
         $elasticsearch = new IndexBuilderStructure();
         $indices = new Indices();
+        //$elasticsearch::setIndexName('Indices');
+        $elasticsearch::indexDocument($indices);
+    }
 
-        $elasticsearch->indexDocument($indices);
+    /**
+     * Inset document test with specified name
+     *
+     * @return void
+     */
+    public function testInsertDocumentToIndexWithSpecifiedName()
+    {
+        $elasticsearch = new IndexBuilderStructure();
+        $indices = new Indices();
+        $elasticsearch::setIndexName('MyManualIndexName');
+        $elasticsearch::indexDocument($indices);
     }
 
     /**
@@ -54,8 +67,8 @@ class IndicesTest extends PhalconUnitTestCase
     {
         $elasticsearch = new IndexBuilderStructure();
         $indices = new Indices();
-
-        $elasticsearch->deleteDocument($indices);
+        // $elasticsearch::setIndexName('Indices');
+        $elasticsearch::deleteDocument($indices);
     }
 
     /**
