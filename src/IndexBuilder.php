@@ -14,19 +14,19 @@ class IndexBuilder
     /**
      * @var \Phalcon\Di
      */
-    private static $di;
+    protected static $di;
 
     /**
      * @var \Elasticsearch\ClientBuilder
      */
-    private static $client;
+    protected static $client;
 
     /**
      * Initialize some classes for internal use
      *
      * @return void
      */
-    private static function initialize()
+    protected static function initialize()
     {
         // Get the DI and set it to a property.
         self::$di = (new \Phalcon\Di())->getDefault();
@@ -57,7 +57,7 @@ class IndexBuilder
      *
      * @return string
      */
-    private static function checks(string $model): string
+    protected static function checks(string $model): string
     {
         // Call the initializer.
         self::initialize();
@@ -227,7 +227,7 @@ class IndexBuilder
      *
      * @return array
      */
-    private static function getFieldsTypes(string $modelPath): array
+    protected static function getFieldsTypes(string $modelPath): array
     {
         // Get the columns description.
         $columns = self::$di->getDb()->describeColumns($modelPath);
@@ -276,7 +276,7 @@ class IndexBuilder
      *
      * @return void
      */
-    private static function getRelatedParams(array &$params, string $parentModel, string $model, int $depth, int $maxDepth): void
+    protected static function getRelatedParams(array &$params, string $parentModel, string $model, int $depth, int $maxDepth): void
     {
         $depth++;
         $relationsData = self::$di->getModelsManager()->getRelations($model);
@@ -340,7 +340,7 @@ class IndexBuilder
      *
      * @return void
      */
-    private static function getCustomParams(array &$params, string $modelPath) : void
+    protected static function getCustomParams(array &$params, string $modelPath) : void
     {
         $modelPath = explode('\\', $modelPath);
         $modelName = end($modelPath);
@@ -378,7 +378,7 @@ class IndexBuilder
      *
      * @return void
      */
-    private static function getRelatedData(array &$document, Model $data, string $parentModel, int $depth, int $maxDepth): void
+    protected static function getRelatedData(array &$document, Model $data, string $parentModel, int $depth, int $maxDepth): void
     {
         $depth++;
         $modelPath = (new \ReflectionClass($data))->name;

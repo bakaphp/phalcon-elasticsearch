@@ -22,8 +22,9 @@
     "require-dev": {
         "codeception/verify": "*",
         "vlucas/phpdotenv": "^2.0",
-        "phalcon/incubator": "dev-master",
-        "elasticsearch/elasticsearch": "^2.3.1"
+        "phalcon/incubator": "^3.3",
+        "elasticsearch/elasticsearch": "^2.3.1",
+        "duncan3dc/fork-helper": "^2.2.0"
     },
     "autoload": {
         "psr-4": {
