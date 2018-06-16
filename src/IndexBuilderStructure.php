@@ -199,6 +199,10 @@ class IndexBuilderStructure extends IndexBuilder
                     $params[$column]['properties'][$innerColumn]['analyzer'] = 'lowercase';
                 }
             } else {
+                //fix issues when neste arrays  contains another array with no fields
+                if (!array_key_exists('properties', $params[$column])) {
+                    $params[$column]['properties'] = [];
+                }
                 self::mapNestedProperties($params[$column]['properties'], $innerColumn, $type);
             }
         }
