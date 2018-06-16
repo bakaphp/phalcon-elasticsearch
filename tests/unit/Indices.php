@@ -3,38 +3,13 @@
 
 class Indices extends Baka\Elasticsearch\Indices
 {
-    /**
-     * @ES\Property(type="integer")
-     */
     public $id;
 
     /**
-     * @ES\Property(type="string")
+     * Index data
+     *
+     * @return stdClass
      */
-    public $name;
-
-    /**
-     * @ES\Property(type="string")
-     */
-    public $description;
-
-    /**
-     * @ES\Property(type="date")
-     */
-    public $date;
-
-    /**
-     * @ES\Property(type="float")
-     */
-    public $money;
-
-    /**
-     * @ES\Property(type="long")
-     */
-    public $anotherMoney;
-
-    public $photos = [];
-
     public function data(): stdClass
     {
         $object = new stdClass();
@@ -45,7 +20,8 @@ class Indices extends Baka\Elasticsearch\Indices
         $object->date = '2018-01-01';
         $object->money = 10.1;
         $object->anotherMoney = 10.1;
-        $object->photo = [
+
+        $photos[] = [
             'name' => 'test',
             'url' => 'http://mctekk.com',
             'vehicles' => [
@@ -54,6 +30,22 @@ class Indices extends Baka\Elasticsearch\Indices
                 'name' => 'wtf',
             ]
         ];
+
+        $photos[] = [
+            'name' => 'test',
+            'url' => 'http://mctekk.com',
+            'vehicles' => [[
+                    'id' => 2,
+                    'date' => '2018-01-02',
+                    'name' => 'wtf', ], [
+                    'id' => 2,
+                    'date' => '2018-01-02',
+                    'name' => 'wtf',
+                ]
+            ]
+        ];
+
+        $object->photo = $photos;
 
         return $object;
     }

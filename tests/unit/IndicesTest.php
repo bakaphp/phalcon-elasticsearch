@@ -16,16 +16,32 @@ class IndicesTest extends PhalconUnitTestCase
 
         $indices = new Indices();
         $elasticsearch->createIndices('Indices');
+    }
+
+    /**
+     * Inset document test
+     *
+     * @return void
+     */
+    public function testInsertDocumentToIndex()
+    {
+        $elasticsearch = new IndexBuilderStructure();
+        $indices = new Indices();
+
         $elasticsearch->indexDocument($indices);
-        /*
-                $reflector = $this->_getDI()->getAnnotations()->get(get_class($indices));
+    }
 
-                $properties = $reflector->getPropertiesAnnotations();
+    /**
+     * Inset document test
+     *
+     * @return void
+     */
+    public function testDeletetDocumentToIndex()
+    {
+        $elasticsearch = new IndexBuilderStructure();
+        $indices = new Indices();
 
-                foreach ($properties as $property) {
-                    print_R($property->get('ES\Property')->getArguments());
-                } */
-        die();
+        $elasticsearch->deleteDocument($indices);
     }
 
     /**

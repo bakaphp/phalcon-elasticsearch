@@ -83,6 +83,7 @@ class IndexBuilderStructure extends IndexBuilder
 
         // Use reflection to extract neccessary information from the object.
         $modelReflection = (new \ReflectionClass($object));
+        $object->document();
 
         $params = [
             'index' => strtolower($modelReflection->getShortName()),
