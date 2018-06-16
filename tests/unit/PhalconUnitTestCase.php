@@ -53,6 +53,7 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
                 'controller' => '',
                 'models' => '',
                 'library' => '',
+                'elasticIndex' => '',
             ],
             'email' => [
                 'driver' => 'smtp',

@@ -30,7 +30,7 @@ class IndexBuilderStructure extends IndexBuilder
         }
 
         // Get the namespace.
-        $namespace = $config['models'];
+        $namespace = $config['elasticIndex'];
 
         // We have to do some work with the model name before we continue to avoid issues.
         $model = str_replace(' ', '', ucwords(str_replace(['_', '-'], ' ', $model)));
