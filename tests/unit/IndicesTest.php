@@ -19,6 +19,20 @@ class IndicesTest extends PhalconUnitTestCase
     }
 
     /**
+     * Test the creation of a index base on a class and specify the name
+     *
+     * @return void
+     */
+    public function testCreateNormalIndexWithSpecifiedName()
+    {
+        $elasticsearch = new IndexBuilderStructure();
+
+        $indices = new Indices();
+        $elasticsearch->setIndexName('MyManualIndexName');
+        $elasticsearch->createIndices('Indices');
+    }
+
+    /**
      * Inset document test
      *
      * @return void

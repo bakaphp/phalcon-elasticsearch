@@ -7,6 +7,8 @@ use \Phalcon\Mvc\Model;
 
 class IndexBuilderStructure extends IndexBuilder
 {
+    protected static $indexName = null;
+
     /**
      * Run checks to avoid unwanted errors.
      *
@@ -95,6 +97,17 @@ class IndexBuilderStructure extends IndexBuilder
     }
 
     /**
+     * Given the need to use this same structure and have diff index with diff name, overwrite the name
+     *
+     * @param string $indexName
+     * @return void
+     */
+    public static function setIndexName(string $indexName): void
+    {
+        self::$indexName = strtolower($indexName);
+    }
+
+    /**
      * Create an index for a model
      *
      * @param string $model
@@ -114,7 +127,7 @@ class IndexBuilderStructure extends IndexBuilder
         $columns = $modelInstance->structure();
 
         // Set the model variable for use as a key.
-        $model = strtolower(str_replace(['_', '-'], '', $model));
+        $model = is_null(self::$indexName) ? strtolower(str_replace(['_', '-'], '', $model)) : self::$indexName;
 
         // Define the initial parameters that will be sent to Elasticsearch.
         $params = [
@@ -199,6 +212,10 @@ class IndexBuilderStructure extends IndexBuilder
                     $params[$column]['properties'][$innerColumn]['analyzer'] = 'lowercase';
                 }
             } else {
+                //fix issues when neste arrays  contains another array with no fields
+                if (!array_key_exists('properties', $params[$column])) {
+                    $params[$column]['properties'] = [];
+                }
                 self::mapNestedProperties($params[$column]['properties'], $innerColumn, $type);
             }
         }
