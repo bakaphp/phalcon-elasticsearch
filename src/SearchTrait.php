@@ -119,7 +119,7 @@ trait SearchTrait
             }
         }
 
-        $sql = ' WHERE' . substr($sql, 4);
+        empty($sql) ?: $sql = ' WHERE' . substr($sql, 4);
 
         $resultsSql = 'SELECT ' . $fields . ' FROM ' . $model . $sql . ' ORDER BY ' . $sort . ($withLimit ? ' LIMIT ' . $offset . ', ' . $limit : '');
 
