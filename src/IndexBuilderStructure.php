@@ -2,8 +2,10 @@
 
 namespace Baka\Elasticsearch;
 
+use Baka\Support\Arr;
 use Exception;
-use \Phalcon\Mvc\Model;
+use InvalidArgumentException;
+use Phalcon\Mvc\Model;
 
 class IndexBuilderStructure extends IndexBuilder
 {
@@ -72,6 +74,45 @@ class IndexBuilderStructure extends IndexBuilder
         ];
 
         return self::$client->index($params);
+    }
+
+    /**
+     * Save a group of objects using bulk API.
+     *
+     * @param array $objects
+     *
+     * @return array
+     */
+    public static function bulkIndexDocuments(array $objects): array
+    {
+        //verify if all objects are instace of phalcon Model
+        if (Arr::all($objects, function ($obj) {
+            return $obj instanceof Model;
+        })) {
+            throw new InvalidArgumentException('Argument passed to bulkIndexDocuments() must be of the type Model');
+        }
+
+        // Call the initializer.
+        self::initialize();
+
+        foreach ($objects as $object) {
+            // Use reflection to extract neccessary information from the object.
+            $modelReflection = (new \ReflectionClass($object));
+
+            $indexName = static::$indexName ?? mb_strtolower($modelReflection->getShortName());
+
+            $params['body'][] = [
+            'index' => [
+                '_index' => $indexName,
+                '_type' => $indexName,
+                '_id' => $object->getId(),
+            ],
+        ];
+
+            $params['body'][] = $object->document();
+        }
+
+        return self::$client->bulk($params);
     }
 
     /**
