@@ -19,6 +19,9 @@
         "baka/http": "^0.1.1",
         "elasticsearch/elasticsearch": "^2.3.1"
     },
+    "scripts": {
+        "test": "./vendor/bin/codecept run"
+    },
     "require-dev": {
         "codeception/verify": "*",
         "duncan3dc/fork-helper": "^2.2.0"
