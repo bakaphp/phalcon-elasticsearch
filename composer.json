@@ -1,4 +1,8 @@
 {
+    "repositories": [{
+        "type": "vcs",
+        "url": "git@github.com:bakaphp/support.git"
+    }],
     "name": "baka/elasticsearch",
     "description": "Baka Elasticsearch component",
     "license": "MIT",
@@ -25,6 +29,7 @@
     "require-dev": {
         "codeception/verify": "0.4.0",
         "duncan3dc/fork-helper": "^2.2.0",
+        "baka/support": "^1.0.0"
     },
     "autoload": {
         "psr-4": {
