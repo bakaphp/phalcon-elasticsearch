@@ -23,8 +23,8 @@
         "test": "./vendor/bin/codecept run"
     },
     "require-dev": {
-        "codeception/verify": "*",
-        "duncan3dc/fork-helper": "^2.2.0"
+        "codeception/verify": "0.4.0",
+        "duncan3dc/fork-helper": "^2.2.0",
     },
     "autoload": {
         "psr-4": {
