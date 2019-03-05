@@ -64,7 +64,7 @@ class IndexBuilderStructure extends IndexBuilder
         $modelReflection = (new \ReflectionClass($object));
         $document = $object->document();
 
-        $indexName = is_null(static::$indexName) ? strtolower($modelReflection->getShortName()) : static::$indexName;
+        $indexName = static::$indexName ?? mb_strtolower($modelReflection->getShortName());
 
         $params = [
             'index' => $indexName,
@@ -130,7 +130,7 @@ class IndexBuilderStructure extends IndexBuilder
         $modelReflection = (new \ReflectionClass($object));
         $object->document();
 
-        $indexName = is_null(static::$indexName) ? strtolower($modelReflection->getShortName()) : static::$indexName;
+        $indexName = static::$indexName ?? mb_strtolower($modelReflection->getShortName());
 
         $params = [
             'index' => $indexName,
@@ -172,7 +172,7 @@ class IndexBuilderStructure extends IndexBuilder
         $columns = $modelInstance->structure();
 
         // Set the model variable for use as a key.
-        $model = is_null(self::$indexName) ? strtolower(str_replace(['_', '-'], '', $model)) : self::$indexName;
+        $model = self::$indexName ?? mb_strtolower(str_replace(['_', '-'], '', $model));
 
         // Define the initial parameters that will be sent to Elasticsearch.
         $params = [
