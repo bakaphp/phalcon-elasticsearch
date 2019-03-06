@@ -77,13 +77,14 @@ class IndexBuilderStructure extends IndexBuilder
     }
 
     /**
-     * Save a group of objects using bulk API.
+     * Save a collection of objects using bulk API
      *
-     * @param array $objects
+     * @param array $objects List of objects to be indexed
+     * @param bool $refresh Whether the index will be forced to refresh the index after indexing
      *
      * @return array
      */
-    public static function bulkIndexDocuments(array $objects): array
+    public static function bulkIndexDocuments(array $objects, bool $refresh = false): array
     {
         //verify if all objects are instace of phalcon Model
         if (!Arr::all($objects, function ($obj) {
@@ -102,15 +103,17 @@ class IndexBuilderStructure extends IndexBuilder
             $indexName = static::$indexName ?? mb_strtolower($modelReflection->getShortName());
 
             $params['body'][] = [
-            'index' => [
-                '_index' => $indexName,
-                '_type' => $indexName,
-                '_id' => $object->getId(),
-            ],
-        ];
+                'index' => [
+                    '_index' => $indexName,
+                    '_type' => $indexName,
+                    '_id' => $object->getId(),
+                ],
+            ];
 
             $params['body'][] = $object->document();
         }
+
+        $params['refresh'] = $refresh;
 
         return self::$client->bulk($params);
     }
