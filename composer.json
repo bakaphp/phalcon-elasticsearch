@@ -21,15 +21,15 @@
         "monolog/monolog": "^1.16",
         "baka/database": "~0.1.0",
         "baka/http": "^0.1.1",
-        "elasticsearch/elasticsearch": "^2.3.1"
+        "elasticsearch/elasticsearch": "^2.3.1",
+        "baka/support": "^1.0.0"
     },
     "scripts": {
         "test": "./vendor/bin/codecept run"
     },
     "require-dev": {
         "codeception/verify": "0.4.0",
-        "duncan3dc/fork-helper": "^2.2.0",
-        "baka/support": "^1.0.0"
+        "duncan3dc/fork-helper": "^2.2.0"
     },
     "autoload": {
         "psr-4": {
