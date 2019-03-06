@@ -145,6 +145,46 @@ class IndexBuilderStructure extends IndexBuilder
     }
 
     /**
+     * Delete a collection of objects using bulk API
+     *
+     * @param array $objects List of objects to be deleted
+     * @param bool $refresh Whether the index will be forced to refresh the index after indexing
+     *
+     * @return array
+     */
+    public static function bulkDeleteDocuments(array $objects, bool $refresh = false): array
+    {
+        //verify if all objects are instace of phalcon Model
+        if (!Arr::all($objects, function ($obj) {
+            return $obj instanceof Model;
+        })) {
+            throw new InvalidArgumentException('Argument passed to bulkDeleteDocument() must be of the type Model');
+        }
+
+        // Call the initializer.
+        self::initialize();
+
+        foreach ($objects as $object) {
+            // Use reflection to extract neccessary information from the object.
+            $modelReflection = (new \ReflectionClass($object));
+
+            $indexName = static::$indexName ?? mb_strtolower($modelReflection->getShortName());
+
+            $params['body'][] = [
+                'delete' => [
+                    '_index' => $indexName,
+                    '_type' => $indexName,
+                    '_id' => $object->getId(),
+                ],
+            ];
+        }
+
+        $params['refresh'] = $refresh;
+
+        return self::$client->bulk($params);
+    }
+
+    /**
      * Given the need to use this same structure and have diff index with diff name, overwrite the name
      *
      * @param string $indexName
