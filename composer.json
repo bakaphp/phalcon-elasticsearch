@@ -1,8 +1,4 @@
 {
-    "repositories": [{
-        "type": "vcs",
-        "url": "git@github.com:bakaphp/support.git"
-    }],
     "name": "baka/elasticsearch",
     "description": "Baka Elasticsearch component",
     "license": "MIT",
