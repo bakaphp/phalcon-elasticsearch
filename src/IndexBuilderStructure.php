@@ -86,7 +86,7 @@ class IndexBuilderStructure extends IndexBuilder
     public static function bulkIndexDocuments(array $objects): array
     {
         //verify if all objects are instace of phalcon Model
-        if (Arr::all($objects, function ($obj) {
+        if (!Arr::all($objects, function ($obj) {
             return $obj instanceof Model;
         })) {
             throw new InvalidArgumentException('Argument passed to bulkIndexDocuments() must be of the type Model');
