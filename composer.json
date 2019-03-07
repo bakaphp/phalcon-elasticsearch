@@ -15,12 +15,13 @@
         "vlucas/phpdotenv": "^2.0",
         "phalcon/incubator": "~3.3",
         "monolog/monolog": "^1.16",
-        "baka/database": "~0.1.0",
-        "baka/http": "^0.1.1",
-        "elasticsearch/elasticsearch": "^2.3.1"
+        "baka/database": "^0.1",
+        "baka/http": "^0.1",
+        "elasticsearch/elasticsearch": "^6.1"
     },
     "require-dev": {
         "codeception/verify": "*",
+        "codeception/codeception": "2.4",
         "duncan3dc/fork-helper": "^2.2.0"
     },
     "autoload": {

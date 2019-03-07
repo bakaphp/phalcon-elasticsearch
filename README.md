@@ -9,6 +9,9 @@ Phalcon Elastic Search package to index / query model with relationship easily
 2. [Search](#markdown-header-QueryParser)
 4. [Testing](#markdown-header-QueryParser-Extended)
 
+## ElasticSearch 6.x configuration
+- `indices.query.bool.max_clause_count' => 1000000` if you are doing long searches for lots of conditionals
+
 ## Installing
 Packages:
 - `"elasticsearch/elasticsearch": "~2.0@beta"`

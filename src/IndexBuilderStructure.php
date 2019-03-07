@@ -137,20 +137,7 @@ class IndexBuilderStructure extends IndexBuilder
         $params = [
             'index' => $model,
             'body' => [
-                'settings' => [
-                    'index.mapping.nested_fields.limit' => $nestedLimit,
-                    'max_result_window' => 50000,
-                    'index.query.bool.max_clause_count' => 1000000,
-                    'analysis' => [
-                        'analyzer' => [
-                            'lowercase' => [
-                                'type' => 'custom',
-                                'tokenizer' => 'keyword',
-                                'filter' => ['lowercase'],
-                            ],
-                        ],
-                    ],
-                ],
+                'settings' => self::getIndicesSettings($nestedLimit),
                 'mappings' => [
                     $model => [
                         'properties' => [],
