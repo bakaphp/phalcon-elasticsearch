@@ -22,13 +22,6 @@ class IndexBuilder
     protected static $client;
 
     /**
-     * indeces properties
-     *
-     * @var array
-     */
-    protected $indexSettings = [];
-
-    /**
      * Initialize some classes for internal use
      *
      * @return void
