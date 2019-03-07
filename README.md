@@ -1,4 +1,4 @@
-# Baka Phalcon Elastic Search
+# Baka Phalcon ElasticSearch
 
 Phalcon Elastic Search package to index / query model with relationship easily
 
