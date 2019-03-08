@@ -60,11 +60,9 @@ class IndexBuilderStructure extends IndexBuilder
         // Call the initializer.
         self::initialize();
 
-        // Use reflection to extract neccessary information from the object.
-        $modelReflection = (new \ReflectionClass($object));
         $document = $object->document();
 
-        $indexName = static::$indexName ?? mb_strtolower($modelReflection->getShortName());
+        $indexName = static::$indexName ?? self::generateIndexNameFromObject($object);
 
         $params = [
             'index' => $indexName,
@@ -86,7 +84,7 @@ class IndexBuilderStructure extends IndexBuilder
      */
     public static function bulkIndexDocuments(array $objects, bool $refresh = false): array
     {
-        //verify if all objects are instace of phalcon Model
+        // Verify if all objects are instace of phalcon Model
         if (!Arr::all($objects, function ($obj) {
             return $obj instanceof Model;
         })) {
@@ -97,10 +95,7 @@ class IndexBuilderStructure extends IndexBuilder
         self::initialize();
 
         foreach ($objects as $object) {
-            // Use reflection to extract neccessary information from the object.
-            $modelReflection = (new \ReflectionClass($object));
-
-            $indexName = static::$indexName ?? mb_strtolower($modelReflection->getShortName());
+            $indexName = static::$indexName ?? self::generateIndexNameFromObject($object);
 
             $params['body'][] = [
                 'index' => [
@@ -129,11 +124,11 @@ class IndexBuilderStructure extends IndexBuilder
         // Call the initializer.
         self::initialize();
 
-        // Use reflection to extract neccessary information from the object.
-        $modelReflection = (new \ReflectionClass($object));
+        // TODO: Remove the need to call this function in order to delete a document
+        // Is not necesary create a whole object just to use the id in order to DELETE document. The ID should be set manually
         $object->document();
 
-        $indexName = static::$indexName ?? mb_strtolower($modelReflection->getShortName());
+        $indexName = static::$indexName ?? self::generateIndexNameFromObject($object);
 
         $params = [
             'index' => $indexName,
@@ -154,7 +149,7 @@ class IndexBuilderStructure extends IndexBuilder
      */
     public static function bulkDeleteDocuments(array $objects, bool $refresh = false): array
     {
-        //verify if all objects are instace of phalcon Model
+        // Verify if all objects are instace of phalcon Model
         if (!Arr::all($objects, function ($obj) {
             return $obj instanceof Model;
         })) {
@@ -165,10 +160,7 @@ class IndexBuilderStructure extends IndexBuilder
         self::initialize();
 
         foreach ($objects as $object) {
-            // Use reflection to extract neccessary information from the object.
-            $modelReflection = (new \ReflectionClass($object));
-
-            $indexName = static::$indexName ?? mb_strtolower($modelReflection->getShortName());
+            $indexName = static::$indexName ?? self::generateIndexNameFromObject($object);
 
             $params['body'][] = [
                 'delete' => [
@@ -307,5 +299,18 @@ class IndexBuilderStructure extends IndexBuilder
                 self::mapNestedProperties($params[$column]['properties'], $innerColumn, $type);
             }
         }
+    }
+
+    /**
+     * Generates an index name from an object
+     *
+     * @param Model $object
+     * @return string
+     */
+    public static function generateIndexNameFromObject(Model $object): string
+    {
+        // Use reflection to extract neccessary information from the object.
+        $modelReflection = (new \ReflectionClass($object));
+        return mb_strtolower($modelReflection->getShortName());
     }
 }
