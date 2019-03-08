@@ -32,7 +32,7 @@ build:
 
     tests:
         override:
-          - ./vendor/bin/codecept run'
+          - './vendor/bin/codecept run'
           -
             command: './vendor/bin/codecept run --coverage-xml'
             coverage:
