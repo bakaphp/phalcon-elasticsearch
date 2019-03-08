@@ -3,7 +3,7 @@ build:
     environment:
         selenium: false
         memcached: false
-        elasticsearch: false
+        elasticsearch: true
         rabbitmq: false
         postgresql: false
         redis: false
@@ -15,8 +15,19 @@ build:
             
     dependencies:
         before:
+          - cp .env.example .env
+          -
+            command: PHPVERSION="$(php -v | grep -Po '(?<=^PHP )[^ ]+')"
+          -
+            command: 'cd ~/ && rm -rf cphalcon && git clone -b 3.4.x -q --depth=1 https://github.com/phalcon/cphalcon.git && cd cphalcon/build && ./install'
+          -
+            command: 'cp -v /home/scrutinizer/cphalcon/build/php7/64bits/modules/phalcon.so  /home/scrutinizer/.phpenv/versions/$PHPVERSION/lib/php/extensions/no-debug-zts-2017071'
+            only_if: 'test -e /home/scrutinizer/cphalcon/build/php7/64bits/modules/phalcon.so'
+          - sed -i '$ a \\n[Phalcon]\nextension=phalcon.so\n' /home/scrutinizer/.phpenv/versions/$PHPVERSION/etc/php.ini
+          - php -m | grep -i Phalcon
+          - sudo /etc/init.d/apache2 restart
           - 
-            command: echo "zend_extension=xdebug.so" | sudo tee -a "/home/scrutinizer/.phpenv/versions/$(php -v | grep -Po '(?<=^PHP )[^ ]+')/etc/php.ini"
+            command: echo "zend_extension=xdebug.so" | sudo tee -a "/home/scrutinizer/.phpenv/versions/$PHPVERSION/etc/php.ini"
 
     tests:
         override:
