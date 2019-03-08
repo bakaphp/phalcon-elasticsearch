@@ -9,7 +9,7 @@ build:
         redis: false
         node: false
         php:
-          version: 7.0
+          version: 7.1
           ini:
             'date.timezone': 'UTC'
             
