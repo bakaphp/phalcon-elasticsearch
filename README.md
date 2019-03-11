@@ -1,4 +1,4 @@
-# Baka Phalcon Elastic Search
+# Baka Phalcon ElasticSearch
 
 Phalcon Elastic Search package to index / query model with relationship easily
 
@@ -11,6 +11,7 @@ Phalcon Elastic Search package to index / query model with relationship easily
 
 ## ElasticSearch 6.x configuration
 - `indices.query.bool.max_clause_count' => 1000000` if you are doing long searches for lots of conditionals
+- [Elasticsearch 6.x Cheatsheet](http://elasticsearch-cheatsheet.jolicode.com/)
 
 ## Installing
 Packages:
