@@ -2,8 +2,10 @@
 
 namespace Baka\Elasticsearch;
 
+use Baka\Support\Arr;
 use Exception;
-use \Phalcon\Mvc\Model;
+use InvalidArgumentException;
+use Phalcon\Mvc\Model;
 
 class IndexBuilderStructure extends IndexBuilder
 {
@@ -58,11 +60,9 @@ class IndexBuilderStructure extends IndexBuilder
         // Call the initializer.
         self::initialize();
 
-        // Use reflection to extract neccessary information from the object.
-        $modelReflection = (new \ReflectionClass($object));
         $document = $object->document();
 
-        $indexName = is_null(static::$indexName) ? strtolower($modelReflection->getShortName()) : static::$indexName;
+        $indexName = static::$indexName ?? self::generateIndexNameFromObject($object);
 
         $params = [
             'index' => $indexName,
@@ -72,6 +72,45 @@ class IndexBuilderStructure extends IndexBuilder
         ];
 
         return self::$client->index($params);
+    }
+
+    /**
+     * Save a collection of objects using bulk API
+     *
+     * @param array $objects List of objects to be indexed
+     * @param bool $refresh Whether the index will be forced to refresh the index after indexing
+     *
+     * @return array
+     */
+    public static function bulkIndexDocuments(array $objects, bool $refresh = false): array
+    {
+        // Verify if all objects are instace of phalcon Model
+        if (!Arr::all($objects, function ($obj) {
+            return $obj instanceof Model;
+        })) {
+            throw new InvalidArgumentException('Argument passed to bulkIndexDocuments() must be of the type Model');
+        }
+
+        // Call the initializer.
+        self::initialize();
+
+        foreach ($objects as $object) {
+            $indexName = static::$indexName ?? self::generateIndexNameFromObject($object);
+
+            $params['body'][] = [
+                'index' => [
+                    '_index' => $indexName,
+                    '_type' => $indexName,
+                    '_id' => $object->getId(),
+                ],
+            ];
+
+            $params['body'][] = $object->document();
+        }
+
+        $params['refresh'] = $refresh;
+
+        return self::$client->bulk($params);
     }
 
     /**
@@ -85,11 +124,11 @@ class IndexBuilderStructure extends IndexBuilder
         // Call the initializer.
         self::initialize();
 
-        // Use reflection to extract neccessary information from the object.
-        $modelReflection = (new \ReflectionClass($object));
+        // TODO: Remove the need to call this function in order to delete a document
+        // Is not necesary create a whole object just to use the id in order to DELETE document. The ID should be set manually
         $object->document();
 
-        $indexName = is_null(static::$indexName) ? strtolower($modelReflection->getShortName()) : static::$indexName;
+        $indexName = static::$indexName ?? self::generateIndexNameFromObject($object);
 
         $params = [
             'index' => $indexName,
@@ -98,6 +137,43 @@ class IndexBuilderStructure extends IndexBuilder
         ];
 
         return self::$client->delete($params);
+    }
+
+    /**
+     * Delete a collection of objects using bulk API
+     *
+     * @param array $objects List of objects to be deleted
+     * @param bool $refresh Whether the index will be forced to refresh the index after indexing
+     *
+     * @return array
+     */
+    public static function bulkDeleteDocuments(array $objects, bool $refresh = false): array
+    {
+        // Verify if all objects are instace of phalcon Model
+        if (!Arr::all($objects, function ($obj) {
+            return $obj instanceof Model;
+        })) {
+            throw new InvalidArgumentException('Argument passed to bulkDeleteDocument() must be of the type Model');
+        }
+
+        // Call the initializer.
+        self::initialize();
+
+        foreach ($objects as $object) {
+            $indexName = static::$indexName ?? self::generateIndexNameFromObject($object);
+
+            $params['body'][] = [
+                'delete' => [
+                    '_index' => $indexName,
+                    '_type' => $indexName,
+                    '_id' => $object->getId(),
+                ],
+            ];
+        }
+
+        $params['refresh'] = $refresh;
+
+        return self::$client->bulk($params);
     }
 
     /**
@@ -131,7 +207,7 @@ class IndexBuilderStructure extends IndexBuilder
         $columns = $modelInstance->structure();
 
         // Set the model variable for use as a key.
-        $model = is_null(self::$indexName) ? strtolower(str_replace(['_', '-'], '', $model)) : self::$indexName;
+        $model = self::$indexName ?? mb_strtolower(str_replace(['_', '-'], '', $model));
 
         // Define the initial parameters that will be sent to Elasticsearch.
         $params = [
@@ -223,5 +299,18 @@ class IndexBuilderStructure extends IndexBuilder
                 self::mapNestedProperties($params[$column]['properties'], $innerColumn, $type);
             }
         }
+    }
+
+    /**
+     * Generates an index name from an object
+     *
+     * @param Model $object
+     * @return string
+     */
+    public static function generateIndexNameFromObject(Model $object): string
+    {
+        // Use reflection to extract neccessary information from the object.
+        $modelReflection = (new \ReflectionClass($object));
+        return mb_strtolower($modelReflection->getShortName());
     }
 }
