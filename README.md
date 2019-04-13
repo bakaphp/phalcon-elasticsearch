@@ -15,7 +15,7 @@ Phalcon Elastic Search package to index / query model with relationship easily
 
 ## Installing
 Packages:
-- `"elasticsearch/elasticsearch": "~2.0@beta"`
+- `"elasticsearch/elasticsearch": "^6.1"`
 - `"baka/database": "dev-master"`
 - `"phalcon/incubator": "~3.0","`
 
