@@ -6,7 +6,7 @@ use stdClass;
 
 abstract class Indices extends \Baka\Database\Model
 {
-    protected $text = 'string';
+    protected $text = 'text';
     protected $integer = 'integer';
     protected $bigInt = 'long';
     protected $dateNormal = ['date', 'yyyy-MM-dd'];

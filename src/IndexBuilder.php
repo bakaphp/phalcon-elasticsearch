@@ -87,6 +87,29 @@ class IndexBuilder
     }
 
     /**
+     * Get the general settings for our predefind indices
+     *
+     * @param integer $nestedLimit
+     * @return array
+     */
+    protected static function getIndicesSettings(int $nestedLimit): array
+    {
+        return [
+            'index.mapping.nested_fields.limit' => $nestedLimit,
+            'max_result_window' => 50000,
+            'analysis' => [
+                'analyzer' => [
+                    'lowercase' => [
+                        'type' => 'custom',
+                        'tokenizer' => 'keyword',
+                        'filter' => ['lowercase'],
+                    ],
+                ],
+            ]
+        ];
+    }
+
+    /**
      * Create an index for a model
      *
      * @param string $model
@@ -109,20 +132,7 @@ class IndexBuilder
         $params = [
             'index' => $model,
             'body' => [
-                'settings' => [
-                    'index.mapping.nested_fields.limit' => $nestedLimit,
-                    'max_result_window' => 50000,
-                    'index.query.bool.max_clause_count' => 1000000,
-                    'analysis' => [
-                        'analyzer' => [
-                            'lowercase' => [
-                                'type' => 'custom',
-                                'tokenizer' => 'keyword',
-                                'filter' => ['lowercase'],
-                            ],
-                        ],
-                    ],
-                ],
+                'settings' => self::getIndicesSettings($nestedLimit),
                 'mappings' => [
                     $model => [
                         'properties' => [],
@@ -246,7 +256,7 @@ class IndexBuilder
                 case Column::TYPE_TEXT:
                 case Column::TYPE_VARCHAR:
                 case Column::TYPE_CHAR:
-                    $fields[$column->getName()] = 'string';
+                    $fields[$column->getName()] = 'text';
                     break;
                 case Column::TYPE_DATE:
                     // We define a format for date fields.
