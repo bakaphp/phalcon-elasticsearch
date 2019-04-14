@@ -14,7 +14,7 @@ abstract class Indices extends \Baka\Database\Model
     protected $decimal = 'float';
 
     /**
-     * Set the Id
+     * Set the Id.
      *
      * @param integer $id
      * @return void
@@ -25,21 +25,21 @@ abstract class Indices extends \Baka\Database\Model
     }
 
     /**
-     * Define de structure for this index in elastic search
+     * Define de structure for this index in elastic search.
      *
      * @return array
      */
     abstract public function structure() : array;
 
     /**
-     * Set the data of the current index
+     * Set the data of the current index.
      *
      * @return stdClass
      */
     abstract public function data() : stdClass;
 
     /**
-     * Given the object of the class we return a array document
+     * Given the object of the class we return a array document.
      *
      * @return array
      */

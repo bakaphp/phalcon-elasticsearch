@@ -2,12 +2,12 @@
 
 namespace Baka\Elasticsearch;
 
-use \Baka\Database\ModelCustomFields;
-use \Baka\Database\CustomFields\CustomFields;
-use \Elasticsearch\ClientBuilder as Client;
-use \Exception;
-use \Phalcon\Db\Column;
-use \Phalcon\Mvc\Model;
+use Baka\Database\ModelCustomFields;
+use Baka\Database\CustomFields\CustomFields;
+use Elasticsearch\ClientBuilder as Client;
+use Exception;
+use Phalcon\Db\Column;
+use Phalcon\Mvc\Model;
 
 class IndexBuilder
 {
@@ -107,6 +107,21 @@ class IndexBuilder
                 ],
             ]
         ];
+    }
+
+    /**
+     * Check if the index exist
+     *
+     * @param string $model
+     * @return void
+     */
+    public static function existIndices(string $model): bool
+    {
+        // Run checks to make sure everything is in order.
+        $modelPath = self::checks($model);
+        $model = strtolower(str_replace(['_', '-'], '', $model));
+
+        return self::$client->indices()->exists(['index' => $model]);
     }
 
     /**

@@ -3,7 +3,8 @@
 namespace Baka\Elasticsearch;
 
 use Exception;
-use \Phalcon\Mvc\Model;
+use Phalcon\Mvc\Model;
+use ReflectionClass;
 
 class IndexBuilderStructure extends IndexBuilder
 {
@@ -21,24 +22,8 @@ class IndexBuilderStructure extends IndexBuilder
         // Call the initializer.
         self::initialize();
 
-        // Check that there is a configuration for namespaces.
-        if (!$config = self::$di->getConfig()->get('namespace')) {
-            throw new Exception('Please add your namespace definitions to the configuration.');
-        }
-
-        // Check that there is a namespace definition for modules.
-        if (!array_key_exists('models', $config)) {
-            throw new Exception('Please add the namespace definition for your models.');
-        }
-
-        // Get the namespace.
-        $namespace = $config['elasticIndex'];
-
-        // We have to do some work with the model name before we continue to avoid issues.
-        $model = str_replace(' ', '', ucwords(str_replace(['_', '-'], ' ', $model)));
-
         // Check that the defined model actually exists.
-        if (!class_exists($model = $namespace . '\\' . $model)) {
+        if (!class_exists($model)) {
             throw new Exception('The specified model does not exist.');
         }
 
@@ -112,6 +97,24 @@ class IndexBuilderStructure extends IndexBuilder
     }
 
     /**
+     * Check if the index exist
+     *
+     * @param string $model
+     * @return void
+     */
+    public static function existIndices(string $model): bool
+    {
+        // Run checks to make sure everything is in order.
+        $modelPath = self::checks($model);
+
+        // We need to instance the model in order to access some of its properties.
+        $modelInstance = new $modelPath();
+        $model = is_null(self::$indexName) ? strtolower(str_replace(['_', '-'], '', (new ReflectionClass($modelInstance))->getShortName())) : self::$indexName;
+
+        return self::$client->indices()->exists(['index' => $model]);
+    }
+
+    /**
      * Create an index for a model
      *
      * @param string $model
@@ -131,7 +134,7 @@ class IndexBuilderStructure extends IndexBuilder
         $columns = $modelInstance->structure();
 
         // Set the model variable for use as a key.
-        $model = is_null(self::$indexName) ? strtolower(str_replace(['_', '-'], '', $model)) : self::$indexName;
+        $model = is_null(self::$indexName) ? strtolower(str_replace(['_', '-'], '', (new ReflectionClass($modelInstance))->getShortName())) : self::$indexName;
 
         // Define the initial parameters that will be sent to Elasticsearch.
         $params = [
@@ -171,7 +174,6 @@ class IndexBuilderStructure extends IndexBuilder
         if (self::$client->indices()->exists(['index' => $model])) {
             self::$client->indices()->delete(['index' => $model]);
         }
-
         return self::$client->indices()->create($params);
     }
 
