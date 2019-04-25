@@ -391,8 +391,10 @@ class IndexBuilder
         $hasOne = self::$di->getModelsManager()->getHasOne($model);
         $belongsTo = self::$di->getModelsManager()->getBelongsTo($model);
         $hasMany = self::$di->getModelsManager()->getHasMany($model);
+        $hasManyToMany = self::$di->getModelsManager()->getHasManyToMany($model);
 
         $hasAll = array_merge($hasOne, $belongsTo);
+        $hasMany = array_merge($hasMany, $hasManyToMany);
 
         foreach ($hasAll as $has) {
             $referencedModel = $has->getReferencedModel();
@@ -445,7 +447,7 @@ class IndexBuilder
                 if ($data->$alias->count()) {
                     //if alias exist over write it and get the none deleted
                     $alias = 'get' . $has->getOptions()['alias'];
-                    $aliasRecords = $data->$alias('is_deleted = 0');
+                    $aliasRecords = $data->$alias($referencedModel.'.is_deleted = 0');
 
                     if (count($aliasRecords) > 0) {
                         foreach ($aliasRecords as $k => $relation) {
