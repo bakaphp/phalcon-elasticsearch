@@ -280,7 +280,11 @@ class IndexBuilder
     {
         $depth++;
         $relationsData = self::$di->getModelsManager()->getRelations($model);
-
+        
+        //for some reason getrelations doesnt get you the hasmanbytomany relationship
+        if (!empty($relationsDataHasManytoMany = self::$di->getModelsManager()->getHasManyToMany(new $model))) {
+            $relationsData = array_merge($relationsData, $relationsDataHasManytoMany);
+        }
         foreach ($relationsData as $relation) {
             $referencedModel = $relation->getReferencedModel();
 
