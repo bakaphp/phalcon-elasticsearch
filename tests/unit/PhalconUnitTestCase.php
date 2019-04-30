@@ -4,6 +4,7 @@ use Phalcon\Mvc\View\Engine\Volt as VoltEngine;
 use \Phalcon\Di;
 use \Phalcon\Test\UnitTestCase as PhalconTestCase;
 use Phalcon\Annotations\Adapter\Memcached;
+use Elasticsearch\ClientBuilder;
 
 abstract class PhalconUnitTestCase extends PhalconTestCase
 {
@@ -23,7 +24,7 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
     private $_loaded = false;
 
     /**
-     * Setup phalconPHP DI to use for testing components
+     * Setup phalconPHP DI to use for testing components.
      *
      * @return Phalcon\DI
      */
@@ -34,7 +35,7 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
         $di = new Phalcon\DI();
 
         /**
-         * DB Config
+         * DB Config.
          * @var array
          */
         $this->_config = new \Phalcon\Config([
@@ -94,7 +95,7 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
         });
 
         /**
-         * Everything needed initialize phalconphp db
+         * Everything needed initialize phalconphp db.
          */
 
         $di->set('mail', function () use ($config, $di) {
@@ -105,7 +106,7 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
         });
 
         /**
-         * config queue by default Beanstalkd
+         * config queue by default Beanstalkd.
          */
         $di->set('queue', function () use ($config) {
             //Connect to the queue
@@ -142,6 +143,16 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
             return $view;
         });
 
+        $di->set('elastic', function () use ($config) {
+            $hosts = $config->elasticSearch->hosts->toArray();
+
+            $client = ClientBuilder::create()
+                                    ->setHosts($hosts)
+                                    ->build();
+
+            return $client;
+        });
+
         $di->set('modelsManager', function () {
             return new Phalcon\Mvc\Model\Manager();
         }, true);
@@ -164,7 +175,7 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
         });
 
         /**
-         * Start the session the first time some component request the session service
+         * Start the session the first time some component request the session service.
          */
         $di->set('session', function () use ($config) {
             $memcache = new \Phalcon\Session\Adapter\Memcache([
@@ -197,5 +208,13 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
         });
 
         return $di;
+    }
+    
+    /**
+     * this runs before everyone
+     */
+    protected function setUp()
+    {
+        $this->_getDI();
     }
 }
