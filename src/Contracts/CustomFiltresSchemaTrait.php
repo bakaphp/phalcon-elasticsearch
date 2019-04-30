@@ -32,7 +32,11 @@ trait CustomFiltresSchemaTrait
         $mapping = array_shift($mapping);
 
         //we only need the infro fromt he properto onward
-        return $this->mappingToArray(array_shift($mapping)['properties']);
+        //we want the result to be in a linear array so we pass it by reference
+        $result = [];
+        $results = $this->mappingToArray(array_shift($mapping)['properties'], null, $result);
+        rsort($results); //rever order?
+        return $results;
     }
 
     /**
@@ -40,22 +44,20 @@ trait CustomFiltresSchemaTrait
      *
      * @param array $mappings
      * @param string $parent
+     * @param array $result
      * @return array
      */
-    protected function mappingToArray(array $mappings, string $parent = null): array
+    protected function mappingToArray(array $mappings, string $parent = null, array &$result): array
     {
-        $result = [];
-
         foreach ($mappings as $key => $mapping) {
             if (isset($mapping['type']) && $mapping['type'] != 'nested') {
                 $result[] = $parent . $key;
             } elseif (isset($mapping['type']) && $mapping['type'] == 'nested' && is_array($mapping)) {
-
                 //setup key
                 $parent .= $key . '.';
 
                 //look for more records
-                $result[] = $this->mappingToArray($mapping['properties'], $parent);
+                $this->mappingToArray($mapping['properties'], $parent, $result);
 
                 //so we finisht with a child , we need to change the parent to one back
                 $parentExploded = explode('.', $parent);
