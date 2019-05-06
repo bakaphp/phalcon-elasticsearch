@@ -7,6 +7,7 @@ class CustomFilterSchemaTest extends PhalconUnitTestCase
 {
     use CustomFiltresSchemaTrait;
     
+    
     /**
      * Emulate DI
      *
@@ -24,7 +25,10 @@ class CustomFilterSchemaTest extends PhalconUnitTestCase
     {
         $this->elastic = $this->getDI()->getElastic();
         
-        print_r($this->getSchema('leads')); die('3');
+        $mapping = $this->getSchema('leads');
+
+        $this->assertTrue(!empty($mapping));
+        $this->assertTrue(array_search('id', $mapping) > 0);
     }
 
 }

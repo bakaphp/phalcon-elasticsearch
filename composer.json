@@ -15,8 +15,8 @@
         "vlucas/phpdotenv": "^2.0",
         "phalcon/incubator": "~3.3",
         "monolog/monolog": "^1.16",
-        "baka/database": "^0.1",
-        "baka/http": "^0.1",
+        "baka/database": "^0.5",
+        "baka/http": "^0.5",
         "elasticsearch/elasticsearch": "^6.1"
     },
     "require-dev": {

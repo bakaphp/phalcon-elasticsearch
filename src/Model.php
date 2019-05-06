@@ -2,8 +2,12 @@
 
 namespace Baka\Elasticsearch;
 
+use Baka\Database\Contracts\CustomFields\CustomFieldsTrait;
+
 class Model extends \Baka\Database\Model
 {
+    use CustomFieldsTrait;
+    
     protected $elasticMaxDepth = 3;
 
     /**
