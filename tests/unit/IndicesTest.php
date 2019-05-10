@@ -71,15 +71,5 @@ class IndicesTest extends PhalconUnitTestCase
         $elasticsearch::deleteDocument($indices);
     }
 
-    /**
-     * this runs before everyone
-     */
-    protected function setUp()
-    {
-        $this->_getDI();
-    }
-
-    protected function tearDown()
-    {
-    }
+   
 }

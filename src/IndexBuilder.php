@@ -2,12 +2,12 @@
 
 namespace Baka\Elasticsearch;
 
-use \Baka\Database\ModelCustomFields;
-use \Baka\Database\CustomFields\CustomFields;
-use \Elasticsearch\ClientBuilder as Client;
-use \Exception;
-use \Phalcon\Db\Column;
-use \Phalcon\Mvc\Model;
+use Baka\Elasticsearch\Model as ModelCustomFields;
+use Baka\Database\CustomFields\CustomFields;
+use Elasticsearch\ClientBuilder as Client;
+use Exception;
+use Phalcon\Db\Column;
+use Phalcon\Mvc\Model;
 
 class IndexBuilder
 {
@@ -110,6 +110,21 @@ class IndexBuilder
     }
 
     /**
+     * Check if the index exist
+     *
+     * @param string $model
+     * @return void
+     */
+    public static function existIndices(string $model): bool
+    {
+        // Run checks to make sure everything is in order.
+        $modelPath = self::checks($model);
+        $model = strtolower(str_replace(['_', '-'], '', $model));
+
+        return self::$client->indices()->exists(['index' => $model]);
+    }
+
+    /**
      * Create an index for a model
      *
      * @param string $model
@@ -167,8 +182,10 @@ class IndexBuilder
         // Call to get the information from related models.
         self::getRelatedParams($params['body']['mappings'][$model]['properties'], $modelPath, $modelPath, 1, $maxDepth);
 
-        // Delete the index before creating it again
-        // @TODO move this to its own function
+        /**
+         * Delete the index before creating it again
+         * @todo move this to its own function
+         */
         if (self::$client->indices()->exists(['index' => $model])) {
             self::$client->indices()->delete(['index' => $model]);
         }
@@ -240,7 +257,7 @@ class IndexBuilder
     protected static function getFieldsTypes(string $modelPath): array
     {
         // Get the columns description.
-        $columns = self::$di->getDb()->describeColumns($modelPath);
+        $columns = self::$di->getDb()->describeColumns(strtolower($modelPath));
         // Define a fields array
         $fields = [];
 
@@ -361,10 +378,10 @@ class IndexBuilder
 
             foreach ($customFields as $field) {
                 $type = [
-                    'type' => 'string',
+                    'type' => 'text',
                     'analyzer' => 'lowercase',
                 ];
-                if ($field->type == 'date') {
+                if ($field['type'] == 'date') {
                     $type = [
                         'type' => 'date',
                         'format' => 'yyyy-MM-dd',
@@ -372,7 +389,7 @@ class IndexBuilder
                     ];
                 }
 
-                $params['custom_fields']['properties'][$field->name] = $type;
+                $params['custom_fields']['properties'][$field['name']] = $type;
             }
         }
     }

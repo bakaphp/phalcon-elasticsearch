@@ -4,6 +4,8 @@ use Phalcon\Mvc\View\Engine\Volt as VoltEngine;
 use \Phalcon\Di;
 use \Phalcon\Test\UnitTestCase as PhalconTestCase;
 use Phalcon\Annotations\Adapter\Memcached;
+use Elasticsearch\ClientBuilder;
+use Baka\Auth\Models\Apps;
 
 abstract class PhalconUnitTestCase extends PhalconTestCase
 {
@@ -23,7 +25,7 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
     private $_loaded = false;
 
     /**
-     * Setup phalconPHP DI to use for testing components
+     * Setup phalconPHP DI to use for testing components.
      *
      * @return Phalcon\DI
      */
@@ -34,16 +36,16 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
         $di = new Phalcon\DI();
 
         /**
-         * DB Config
+         * DB Config.
          * @var array
          */
         $this->_config = new \Phalcon\Config([
             'database' => [
                 'adapter' => 'Mysql',
-                'host' => getenv('DATABASE_HOST'),
-                'username' => getenv('DATABASE_USER'),
-                'password' => getenv('DATABASE_PASS'),
-                'dbname' => getenv('DATABASE_NAME'),
+                'host' => getenv('DATA_API_MYSQL_HOST'),
+                'username' => getenv('DATA_API_MYSQL_USER'),
+                'password' => getenv('DATA_API_MYSQL_PASS'),
+                'dbname' => getenv('DATA_API_MYSQL_NAME'),
             ],
             'memcache' => [
                 'host' => getenv('MEMCACHE_HOST'),
@@ -51,9 +53,9 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
             ],
             'namespace' => [
                 'controller' => '',
-                'models' => '',
+                'models' => 'Test\Model',
                 'library' => '',
-                'elasticIndex' => '',
+                'elasticIndex' => 'Test\Indices',
             ],
             'email' => [
                 'driver' => 'smtp',
@@ -94,7 +96,7 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
         });
 
         /**
-         * Everything needed initialize phalconphp db
+         * Everything needed initialize phalconphp db.
          */
 
         $di->set('mail', function () use ($config, $di) {
@@ -105,7 +107,7 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
         });
 
         /**
-         * config queue by default Beanstalkd
+         * config queue by default Beanstalkd.
          */
         $di->set('queue', function () use ($config) {
             //Connect to the queue
@@ -142,6 +144,16 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
             return $view;
         });
 
+        $di->set('elastic', function () use ($config) {
+            $hosts = $config->elasticSearch->hosts->toArray();
+
+            $client = ClientBuilder::create()
+                                    ->setHosts($hosts)
+                                    ->build();
+
+            return $client;
+        });
+
         $di->set('modelsManager', function () {
             return new Phalcon\Mvc\Model\Manager();
         }, true);
@@ -163,8 +175,12 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
             return $connection;
         });
 
+        $di->set('app', function () {
+            return Apps::findFirst();
+        }, true);
+
         /**
-         * Start the session the first time some component request the session service
+         * Start the session the first time some component request the session service.
          */
         $di->set('session', function () use ($config) {
             $memcache = new \Phalcon\Session\Adapter\Memcache([
@@ -197,5 +213,13 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
         });
 
         return $di;
+    }
+    
+    /**
+     * this runs before everyone
+     */
+    protected function setUp()
+    {
+        $this->_getDI();
     }
 }
