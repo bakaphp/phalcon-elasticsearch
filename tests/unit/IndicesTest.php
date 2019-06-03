@@ -70,6 +70,4 @@ class IndicesTest extends PhalconUnitTestCase
         // $elasticsearch::setIndexName('Indices');
         $elasticsearch::deleteDocument($indices);
     }
-
-   
 }

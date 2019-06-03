@@ -19,6 +19,9 @@
         "baka/http": "^0.5",
         "elasticsearch/elasticsearch": "^6.1"
     },
+    "scripts": {
+        "test": "./vendor/bin/codecept run"
+    },
     "require-dev": {
         "codeception/verify": "*",
         "codeception/codeception": "2.4",
