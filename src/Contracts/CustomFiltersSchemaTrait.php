@@ -2,13 +2,10 @@
 
 namespace Baka\Elasticsearch\Contracts;
 
-use Phalcon\Http\Response;
-use stdClass;
-
 /**
  * Search controller.
  */
-trait CustomFiltresSchemaTrait
+trait CustomFiltersSchemaTrait
 {
     /**
      * Given the indice get the Schema configuration for the filter.
