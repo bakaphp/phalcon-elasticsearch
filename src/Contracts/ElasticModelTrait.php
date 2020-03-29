@@ -1,6 +1,6 @@
 <?php
 
-namespace Baka\Elasticsearch;
+namespace Baka\Elasticsearch\Contracts;
 
 use Baka\Database\Contracts\CustomFields\CustomFieldsTrait;
 
