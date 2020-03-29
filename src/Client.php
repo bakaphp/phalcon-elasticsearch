@@ -32,9 +32,9 @@ class Client
             'base_uri' => $this->host,
         ]);
 
-        // since 6.x we need to use POST
-        $response = $client->post('/_sql', [
-            'body' => trim($sql),
+        // since 6.x+ we need to use POST
+        $response = $client->post($this->getDriverUrl(), [
+            $this->getPostKey() => trim($sql),
             'headers' => [
                 'content-type' => 'application/json',
                 'Accept' => 'application/json'
@@ -42,7 +42,10 @@ class Client
         ]);
 
         //get the response in a array
-        $results = json_decode($response->getBody()->getContents(), true);
+        $results = json_decode(
+            $response->getBody()->getContents(),
+            true
+        );
 
         if ($results['hits']['total'] == 0) {
             return [];
@@ -52,9 +55,48 @@ class Client
     }
 
     /**
+     * Reading the env variables determine
+     * the POST host URl.
+     *
+     * @return string
+     */
+    protected function getDriverUrl(): string
+    {
+        switch (getenv('ELASTIC_DRIVE')) {
+            case 'opendistro':
+                $url = '/_opendistro/_sql';
+                break;
+            default:
+                $url = '/_nlpcn/sql';
+                break;
+        }
+
+        return $url;
+    }
+
+    /**
+     * Given the driver config , determine the post Key.
+     *
+     * @return string
+     */
+    protected function getPostKey(): string
+    {
+        switch (getenv('ELASTIC_DRIVE')) {
+            case 'opendistro':
+                $key = 'query';
+                break;
+            default:
+                $key = 'sql';
+                break;
+        }
+
+        return $key;
+    }
+
+    /**
      * Given the elastic results, return only the data.
      *
-     * @param array $resonse
+     * @param array $results
      * @return array
      */
     private function getResults(array $results): array

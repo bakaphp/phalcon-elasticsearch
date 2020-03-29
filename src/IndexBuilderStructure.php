@@ -60,7 +60,7 @@ class IndexBuilderStructure extends IndexBuilder
     }
 
     /**
-     * Delete a document from Elastic
+     * Delete a document from Elastic.
      *
      * @param Model $object
      * @return array
@@ -86,7 +86,7 @@ class IndexBuilderStructure extends IndexBuilder
     }
 
     /**
-     * Given the need to use this same structure and have diff index with diff name, overwrite the name
+     * Given the need to use this same structure and have diff index with diff name, overwrite the name.
      *
      * @param string $indexName
      * @return void
@@ -97,7 +97,7 @@ class IndexBuilderStructure extends IndexBuilder
     }
 
     /**
-     * Check if the index exist
+     * Check if the index exist.
      *
      * @param string $model
      * @return void
@@ -115,7 +115,7 @@ class IndexBuilderStructure extends IndexBuilder
     }
 
     /**
-     * Create an index for a model
+     * Create an index for a model.
      *
      * @param string $model
      * @param int $maxDepth
@@ -178,7 +178,7 @@ class IndexBuilderStructure extends IndexBuilder
     }
 
     /**
-     * Map the neste properties of a index by using recursive calls
+     * Map the neste properties of a index by using recursive calls.
      *
      * @todo we are reusing this code on top so we must find a better way to handle it @kaioken
      *

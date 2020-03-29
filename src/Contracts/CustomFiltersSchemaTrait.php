@@ -8,9 +8,9 @@ namespace Baka\Elasticsearch\Contracts;
 trait CustomFiltersSchemaTrait
 {
     /**
-     * Given the indice get the Schema configuration for the filter.
+     * Given the index get the Schema configuration for the filter.
      *
-     * @param string $indice
+     * @param string $index
      * @return array
      */
     public function getSchema(string $index): array
@@ -21,23 +21,23 @@ trait CustomFiltersSchemaTrait
 
         $mapping = array_shift($mapping);
 
-        //if we dont find mapping return empty
+        //if we don't find mapping return empty
         if (!isset($mapping['mappings'])) {
             return [];
         }
 
         $mapping = array_shift($mapping);
 
-        //we only need the infro fromt he properto onward
+        //we only need the info from the property onward
         //we want the result to be in a linear array so we pass it by reference
         $result = [];
         $results = $this->mappingToArray(array_shift($mapping)['properties'], null, $result);
-        rsort($results); //rever order?
+        rsort($results); //revert order?
         return $results;
     }
 
     /**
-     * Generate the array map fromt he elastic search mapping.
+     * Generate the array map from the elastic search mapping.
      *
      * @param array $mappings
      * @param string $parent
@@ -56,7 +56,7 @@ trait CustomFiltersSchemaTrait
                 //look for more records
                 $this->mappingToArray($mapping['properties'], $parent, $result);
 
-                //so we finisht with a child , we need to change the parent to one back
+                //so we finish with a child , we need to change the parent to one back
                 $parentExploded = explode('.', $parent);
                 $parent = count($parentExploded) > 2 ? $parentExploded[0] . '.' : null;
             }

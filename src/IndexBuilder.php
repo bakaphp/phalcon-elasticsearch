@@ -8,7 +8,9 @@ use Elasticsearch\ClientBuilder as Client;
 use Exception;
 use Phalcon\Db\Column;
 use Phalcon\Mvc\Model;
-
+use Phalcon\Di;
+use ReflectionClass;
+use Phalcon\Mvc\ModelInterface;
 class IndexBuilder
 {
     /**
@@ -22,14 +24,14 @@ class IndexBuilder
     protected static $client;
 
     /**
-     * Initialize some classes for internal use
+     * Initialize some classes for internal use.
      *
      * @return void
      */
     protected static function initialize()
     {
         // Get the DI and set it to a property.
-        self::$di = (new \Phalcon\Di())->getDefault();
+        self::$di = Di::getDefault();
 
         // Load the config through the DI.
         if (!self::$di->has('config')) {
@@ -49,45 +51,20 @@ class IndexBuilder
         // Instance the Elasticsearch client.
         self::$client = Client::create()->setHosts($config['hosts']->toArray())->build();
     }
-
+    
     /**
-     * Run checks to avoid unwanted errors.
+     * Given a model name class name get it index name
      *
      * @param string $model
-     *
      * @return string
      */
-    protected static function checks(string $model): string
+    public static function getIndexName(ModelInterface $model): string
     {
-        // Call the initializer.
-        self::initialize();
-
-        // Check that there is a configuration for namespaces.
-        if (!$config = self::$di->getConfig()->get('namespace')) {
-            throw new Exception('Please add your namespace definitions to the configuration.');
-        }
-
-        // Check that there is a namespace definition for modules.
-        if (!array_key_exists('models', $config)) {
-            throw new Exception('Please add the namespace definition for your models.');
-        }
-
-        // Get the namespace.
-        $namespace = $config['models'];
-
-        // We have to do some work with the model name before we continue to avoid issues.
-        $model = str_replace(' ', '', ucwords(str_replace(['_', '-'], ' ', $model)));
-
-        // Check that the defined model actually exists.
-        if (!class_exists($model = $namespace . '\\' . $model)) {
-            throw new Exception('The specified model does not exist.');
-        }
-
-        return $model;
+        return strtolower($model->getSource());
     }
 
     /**
-     * Get the general settings for our predefind indices
+     * Get the general settings for our predefind indices.
      *
      * @param integer $nestedLimit
      * @return array
@@ -110,46 +87,44 @@ class IndexBuilder
     }
 
     /**
-     * Check if the index exist
+     * Check if the index exist.
      *
      * @param string $model
      * @return void
      */
-    public static function existIndices(string $model): bool
+    public static function existIndices(ModelInterface $model): bool
     {
         // Run checks to make sure everything is in order.
-        $modelPath = self::checks($model);
-        $model = strtolower(str_replace(['_', '-'], '', $model));
-
-        return self::$client->indices()->exists(['index' => $model]);
+        self::initialize();
+        
+        return self::$client->indices()->exists(['index' => self::getIndexName($model)]);
     }
 
     /**
-     * Create an index for a model
+     * Create an index for a model.
      *
      * @param string $model
      * @param int $maxDepth
      *
      * @return array
      */
-    public static function createIndices(string $model, int $maxDepth = 3, int $nestedLimit = 75): array
+    public static function createIndices(ModelInterface $model, int $maxDepth = 3, int $nestedLimit = 75): array
     {
         // Run checks to make sure everything is in order.
-        $modelPath = self::checks($model);
-        // We need to instance the model in order to access some of its properties.
-        $modelInstance = new $modelPath();
+        self::initialize();
+
         // Get the model's table structure.
         $columns = self::getFieldsTypes($model);
         // Set the model variable for use as a key.
-        $model = strtolower(str_replace(['_', '-'], '', $model));
+        $index = self::getIndexName($model);
 
         // Define the initial parameters that will be sent to Elasticsearch.
         $params = [
-            'index' => $model,
+            'index' => $index,
             'body' => [
                 'settings' => self::getIndicesSettings($nestedLimit),
                 'mappings' => [
-                    $model => [
+                    $index => [
                         'properties' => [],
                     ],
                 ],
@@ -160,34 +135,34 @@ class IndexBuilder
         foreach ($columns as $column => $type) {
             if (is_array($type)) {
                 // Remember we used an array to define the types for dates. This is the only case for now.
-                $params['body']['mappings'][$model]['properties'][$column] = [
+                $params['body']['mappings'][$index]['properties'][$column] = [
                     'type' => $type[0],
                     'format' => $type[1],
                 ];
             } else {
-                $params['body']['mappings'][$model]['properties'][$column] = ['type' => $type];
+                $params['body']['mappings'][$index]['properties'][$column] = ['type' => $type];
 
                 if ($type == 'string'
-                    && property_exists($modelInstance, 'elasticSearchNotAnalyzed')
-                    && $modelInstance->elasticSearchNotAnalyzed
+                    && property_exists($model, 'elasticSearchNotAnalyzed')
+                    && $model->elasticSearchNotAnalyzed
                 ) {
-                    $params['body']['mappings'][$model]['properties'][$column]['analyzer'] = 'lowercase';
+                    $params['body']['mappings'][$index]['properties'][$column]['analyzer'] = 'lowercase';
                 }
             }
         }
 
         // Get custom fields... fields.
-        self::getCustomParams($params['body']['mappings'][$model]['properties'], $modelPath);
+        self::getCustomParams($params['body']['mappings'][$index]['properties'], $model);
 
         // Call to get the information from related models.
-        self::getRelatedParams($params['body']['mappings'][$model]['properties'], $modelPath, $modelPath, 1, $maxDepth);
+        self::getRelatedParams($params['body']['mappings'][$index]['properties'], $model, $model, 1, $maxDepth);
 
         /**
-         * Delete the index before creating it again
+         * Delete the index before creating it again.
          * @todo move this to its own function
          */
-        if (self::$client->indices()->exists(['index' => $model])) {
-            self::$client->indices()->delete(['index' => $model]);
+        if (self::$client->indices()->exists(['index' => $index])) {
+            self::$client->indices()->delete(['index' => $index]);
         }
 
         return self::$client->indices()->create($params);
@@ -201,23 +176,23 @@ class IndexBuilder
      *
      * @return array
      */
-    public static function indexDocument(Model $object, int $maxDepth = 3): array
+    public static function indexDocument(ModelInterface $model, int $maxDepth = 3): array
     {
         // Call the initializer.
         self::initialize();
 
-        // Start the document we are going to insert by convertin the object to an array.
-        $document = ModelCustomFields::getCustomFields($object, true);
+        // Start the document we are going to insert by converting the object to an array.
+        $document = ModelCustomFields::getCustomFields($model, true);
 
-        // Use reflection to extract neccessary information from the object.
-        $modelReflection = (new \ReflectionClass($object));
+        // Use reflection to extract necessary information from the object.
+        $modelReflection = (new ReflectionClass($model));
 
-        self::getRelatedData($document, $object, $modelReflection->name, 1, $maxDepth);
+        self::getRelatedData($document, $model, $modelReflection->name, 1, $maxDepth);
 
         $params = [
-            'index' => strtolower($modelReflection->getShortName()),
-            'type' => strtolower($modelReflection->getShortName()),
-            'id' => $object->getId(),
+            'index' => self::getIndexName($model),
+            'type' => self::getIndexName($model),
+            'id' => $model->getId(),
             'body' => $document,
         ];
 
@@ -225,39 +200,36 @@ class IndexBuilder
     }
 
     /**
-     * Delete a document from Elastic
+     * Delete a document from Elastic.
      *
      * @param Model $object
      * @return array
      */
-    public static function deleteDocument(Model $object): array
+    public static function deleteDocument(ModelInterface $model): array
     {
         // Call the initializer.
         self::initialize();
 
-        // Use reflection to extract neccessary information from the object.
-        $modelReflection = (new \ReflectionClass($object));
-
         $params = [
-            'index' => strtolower($modelReflection->getShortName()),
-            'type' => strtolower($modelReflection->getShortName()),
-            'id' => $object->getId(),
+            'index' => self::getIndexName($model),
+            'type' => self::getIndexName($model),
+            'id' => $model->getId(),
         ];
 
         return self::$client->delete($params);
     }
 
     /**
-     * Retrieve a model's table structure so that we can define the appropiate Elasticsearch data type.
+     * Retrieve a model's table structure so that we can define the appropriate Elasticsearch data type.
      *
      * @param string $modelPath
      *
      * @return array
      */
-    protected static function getFieldsTypes(string $modelPath): array
+    protected static function getFieldsTypes(ModelInterface $model): array
     {
         // Get the columns description.
-        $columns = self::$di->getDb()->describeColumns(strtolower($modelPath));
+        $columns = $model->getReadConnection()->describeColumns($model->getSource());
         // Define a fields array
         $fields = [];
 
@@ -314,7 +286,7 @@ class IndexBuilder
             if ($referencedModel != $parentModel) {
                 $referencedModel = new $referencedModel();
 
-                //ignore properies we dont need right now
+                //ignore properties we don't need right now
                 if (array_key_exists('elasticSearch', $relation->getOptions())) {
                     if (!$relation->getOptions()['elasticSearch']) {
                         continue;
@@ -405,10 +377,10 @@ class IndexBuilder
      *
      * @return void
      */
-    protected static function getRelatedData(array &$document, Model $data, string $parentModel, int $depth, int $maxDepth): void
+    protected static function getRelatedData(array &$document, ModelInterface $data, string $parentModel, int $depth, int $maxDepth): void
     {
         $depth++;
-        $modelPath = (new \ReflectionClass($data))->name;
+        $modelPath = (new ReflectionClass($data))->name;
         $model = new $modelPath;
 
         $hasOne = self::$di->getModelsManager()->getHasOne($model);

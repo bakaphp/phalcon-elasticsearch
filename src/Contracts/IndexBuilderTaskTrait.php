@@ -6,15 +6,16 @@ use Phalcon\Queue\Beanstalk\Extended as BeanstalkExtended;
 use Phalcon\Queue\Beanstalk\Job;
 use Throwable;
 use Baka\Elasticsearch\IndexBuilder;
+use Phalcon\Di;
 
 /**
- * This is the CLI to create you index based on this package
+ * This is the CLI to create you index based on this package.
  *
  */
 trait IndexBuilderTaskTrait
 {
     /**
-     * Main function
+     * Main function.
      *
      * @return void
      */
@@ -24,12 +25,12 @@ trait IndexBuilderTaskTrait
     }
 
     /**
-     * Action Descriptor
+     * Action Descriptor.
      *
      * Command: indices
      * Description: Create the elasticsearch index for a model.
      *
-     * php cli/app.php elasticsearch createIndex indexname 4 (model relationship lenght)
+     * php cli/app.php elasticsearch createIndex index_name 4 (model relationship length)
      *
      * @param string $model
      * @param int $maxDepth
@@ -51,25 +52,23 @@ trait IndexBuilderTaskTrait
     }
 
     /**
-     * Action Descriptor
+     * Action Descriptor.
      *
-     * Command: insert
-     * Description: Create the elasticsearch index all info for a model.
+     * Command: index
+     * Description: Create the elasticsearch index and insert all the model data
      *
-     * php cli/app.php elasticsearch insert modelName 0 1
+     * php cli/app.php elasticsearch index modelName 0 1
      *
      * @param string $model
      * @param int $maxDepth
      *
      * @return void
      */
-    public function insertAction($params): void
+    public function indexAction($params): void
     {
         list($model, $maxDepth) = $params + ['', 3];
 
         if (!empty($model)) {
-            // Get model
-            $model = $this->config->namespace->models . '\\' . $model;
             // Get model's records
             $records = $model::find('is_deleted = 0');
             // Get elasticsearch class handler instance
@@ -82,7 +81,7 @@ trait IndexBuilderTaskTrait
     }
 
     /**
-      * Elastic Search insert Queue
+      * Elastic Search insert Queue.
       *
       *  php cli/app.php elasticsearch queue queueName
       *
@@ -102,9 +101,9 @@ trait IndexBuilderTaskTrait
                 'prefix' => $this->config->beanstalk->prefix,
             ]);
 
-            // Variables needed by the annonymous function
+            // Variables needed by the anonymous function
             $config = $this->config;
-            $di = \Phalcon\DI\FactoryDefault::getDefault();
+            $di = Di::getDefault();
 
             //call queue tube
             $queue->addWorker($queueName[0], function (Job $job) use ($di, $config) {
@@ -116,11 +115,8 @@ trait IndexBuilderTaskTrait
                     $id = $record['id'];
                     $maxDepth = isset($record['maxDepth']) ? $record['maxDepth'] : 1;
 
-                    // Get model
-                    $model = $this->config->namespace->models . '\\' . $model;
-
                     if (!class_exists($model)) {
-                        $this->log->error('Queue Elastic class doesnt exit ' . $model);
+                        $this->log->error('Queue Elastic class doesn\'t exit ' . $model);
                         return;
                     }
 
