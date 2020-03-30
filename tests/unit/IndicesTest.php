@@ -6,7 +6,7 @@ class IndicesTest extends PhalconUnitTestCase
 {
     /**
      * Test the creation of a normal index based on a model extending
-     * from the Indices class of the package
+     * from the Indices class of the package.
      *
      * @return void
      */
@@ -19,7 +19,7 @@ class IndicesTest extends PhalconUnitTestCase
     }
 
     /**
-     * Test the creation of a index base on a class and specify the name
+     * Test the creation of a index base on a class and specify the name.
      *
      * @return void
      */
@@ -33,7 +33,7 @@ class IndicesTest extends PhalconUnitTestCase
     }
 
     /**
-     * Inset document test normal
+     * Inset document test normal.
      *
      * @return void
      */
@@ -43,12 +43,11 @@ class IndicesTest extends PhalconUnitTestCase
         $indices = new Indices();
         //$elasticsearch::setIndexName('Indices');
         $results = $elasticsearch::indexDocument($indices);
-        $this->assertTrue(in_array($results['result'], ['updated' , 'created']));
-
+        $this->assertTrue(in_array($results['result'], ['updated', 'created']));
     }
 
     /**
-     * Inset document test with specified name
+     * Inset document test with specified name.
      *
      * @return void
      */
@@ -59,18 +58,18 @@ class IndicesTest extends PhalconUnitTestCase
         $elasticsearch::setIndexName('MyManualIndexName');
         $results = $elasticsearch::indexDocument($indices);
 
-        $this->assertTrue(in_array($results['result'], ['updated' , 'created']));
+        $this->assertTrue(in_array($results['result'], ['updated', 'created']));
     }
 
     /**
-     * Inset document test
+     * Inset document test.
      *
      * @return void
      */
     public function testDeletetDocumentToIndex()
     {
         $elasticsearch = new IndexBuilderStructure();
-        
+
         $indices = new Indices();
         $indices->setId(1);
         $results = $elasticsearch::deleteDocument($indices);
