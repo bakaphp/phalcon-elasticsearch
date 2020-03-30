@@ -11,6 +11,7 @@ use Phalcon\Mvc\Model;
 use Phalcon\Di;
 use ReflectionClass;
 use Phalcon\Mvc\ModelInterface;
+
 class IndexBuilder
 {
     /**
@@ -51,9 +52,9 @@ class IndexBuilder
         // Instance the Elasticsearch client.
         self::$client = Client::create()->setHosts($config['hosts']->toArray())->build();
     }
-    
+
     /**
-     * Given a model name class name get it index name
+     * Given a model name class name get it index name.
      *
      * @param string $model
      * @return string
@@ -96,7 +97,7 @@ class IndexBuilder
     {
         // Run checks to make sure everything is in order.
         self::initialize();
-        
+
         return self::$client->indices()->exists(['index' => self::getIndexName($model)]);
     }
 
@@ -117,6 +118,7 @@ class IndexBuilder
         $columns = self::getFieldsTypes($model);
         // Set the model variable for use as a key.
         $index = self::getIndexName($model);
+        $modelClass = get_class($model);
 
         // Define the initial parameters that will be sent to Elasticsearch.
         $params = [
@@ -124,38 +126,36 @@ class IndexBuilder
             'body' => [
                 'settings' => self::getIndicesSettings($nestedLimit),
                 'mappings' => [
-                    $index => [
-                        'properties' => [],
-                    ],
+                   
                 ],
             ],
         ];
-
+     
         // Iterate each column to set it in the index definition.
         foreach ($columns as $column => $type) {
             if (is_array($type)) {
                 // Remember we used an array to define the types for dates. This is the only case for now.
-                $params['body']['mappings'][$index]['properties'][$column] = [
+                $params['body']['mappings']['properties'][$column] = [
                     'type' => $type[0],
                     'format' => $type[1],
                 ];
             } else {
-                $params['body']['mappings'][$index]['properties'][$column] = ['type' => $type];
+                $params['body']['mappings']['properties'][$column] = ['type' => $type];
 
                 if ($type == 'string'
                     && property_exists($model, 'elasticSearchNotAnalyzed')
                     && $model->elasticSearchNotAnalyzed
                 ) {
-                    $params['body']['mappings'][$index]['properties'][$column]['analyzer'] = 'lowercase';
+                    $params['body']['mappings']['properties'][$column]['analyzer'] = 'lowercase';
                 }
             }
         }
-
+       
         // Get custom fields... fields.
-        self::getCustomParams($params['body']['mappings'][$index]['properties'], $model);
-
+        self::getCustomParams($params['body']['mappings']['properties'], $modelClass);
+       
         // Call to get the information from related models.
-        self::getRelatedParams($params['body']['mappings'][$index]['properties'], $model, $model, 1, $maxDepth);
+        self::getRelatedParams($params['body']['mappings']['properties'], $modelClass, $modelClass, 1, $maxDepth);
 
         /**
          * Delete the index before creating it again.
@@ -165,6 +165,8 @@ class IndexBuilder
             self::$client->indices()->delete(['index' => $index]);
         }
 
+      
+        print_r($params); die();
         return self::$client->indices()->create($params);
     }
 
@@ -286,6 +288,10 @@ class IndexBuilder
             if ($referencedModel != $parentModel) {
                 $referencedModel = new $referencedModel();
 
+                if (!is_array($relation->getOptions()) || !array_key_exists('alias', $relation->getOptions())) {
+                    throw new Exception('Model Relationship ' . get_class($referencedModel) . ' need alias defined');
+                };
+
                 //ignore properties we don't need right now
                 if (array_key_exists('elasticSearch', $relation->getOptions())) {
                     if (!$relation->getOptions()['elasticSearch']) {
@@ -296,7 +302,7 @@ class IndexBuilder
                 $alias = strtolower($relation->getOptions()['alias']);
                 $params[$alias] = ['type' => 'nested'];
 
-                $fieldsData = self::getFieldsTypes($referencedModel->getSource());
+                $fieldsData = self::getFieldsTypes($referencedModel);
                 foreach ($fieldsData as $column => $type) {
                     // For now this is only being used for date/datetime fields
                     if (is_array($type)) {

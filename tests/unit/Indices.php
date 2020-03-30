@@ -1,8 +1,12 @@
 <?php
 
+use Baka\Database\Model;
+use Baka\Elasticsearch\Contracts\ElasticIndexTrait;
 
-class Indices extends Baka\Elasticsearch\Indices
+class Indices extends Model
 {
+    use ElasticIndexTrait;
+    
     public $id;
 
     /**

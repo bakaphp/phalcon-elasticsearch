@@ -1,15 +1,15 @@
 <?php
 
+use Baka\Elasticsearch\Contracts\CustomFiltersSchemaTrait;
 use Baka\Elasticsearch\IndexBuilderStructure;
 use Baka\Elasticsearch\Contracts\IndexBuilderTaskTrait;
 use Test\Model\Leads;
-use Baka\Elasticsearch\Contracts\CustomFiltresSchemaTrait;
 use Baka\Elasticsearch\IndexBuilder;
 
 class IndicesModelTest extends PhalconUnitTestCase
 {
     use IndexBuilderTaskTrait;
-    use CustomFiltresSchemaTrait;
+    use CustomFiltersSchemaTrait;
 
     public $config;
 
@@ -18,13 +18,13 @@ class IndicesModelTest extends PhalconUnitTestCase
      *
      * @return void
      */
-    public function testCreateIndiceFromModel()
+    public function testCreateIndexFromModel()
     {
         $this->elastic = $this->getDI()->getElastic();
 
         //create index
         $this->createIndexAction([
-            'Leads', //model
+            new Leads(),
             '1' //depth
         ]);
 
@@ -44,8 +44,8 @@ class IndicesModelTest extends PhalconUnitTestCase
         $this->config = $this->getDI()->getConfig();
         $this->elastic = $this->getDI()->getElastic();
 
-        $this->insertAction([
-            'Leads', //model
+        $this->indexAction([
+            new Leads(),
             1, //depth
         ]);
 

@@ -1,11 +1,12 @@
 <?php
 
 use Phalcon\Mvc\View\Engine\Volt as VoltEngine;
-use \Phalcon\Di;
-use \Phalcon\Test\UnitTestCase as PhalconTestCase;
+use Phalcon\Di;
+use Phalcon\Test\UnitTestCase as PhalconTestCase;
 use Phalcon\Annotations\Adapter\Memcached;
 use Elasticsearch\ClientBuilder;
 use Baka\Auth\Models\Apps;
+use Phalcon\Config;
 
 abstract class PhalconUnitTestCase extends PhalconTestCase
 {
@@ -31,15 +32,15 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
      */
     protected function _getDI()
     {
-        Phalcon\DI::reset();
+        DI::reset();
 
-        $di = new Phalcon\DI();
+        $di = new DI();
 
         /**
          * DB Config.
          * @var array
          */
-        $this->_config = new \Phalcon\Config([
+        $this->_config = new Config([
             'database' => [
                 'adapter' => 'Mysql',
                 'host' => getenv('DATA_API_MYSQL_HOST'),
@@ -101,7 +102,7 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
 
         $di->set('mail', function () use ($config, $di) {
             //setup
-            $mailer = new \Baka\Mail\Manager($config->email->toArray());
+            $mailer = new Baka\Mail\Manager($config->email->toArray());
 
             return $mailer->createMessage();
         });
@@ -111,7 +112,7 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
          */
         $di->set('queue', function () use ($config) {
             //Connect to the queue
-            $queue = new \Phalcon\Queue\Beanstalk\Extended([
+            $queue = new Phalcon\Queue\Beanstalk\Extended([
                 'host' => $config->beanstalk->host,
                 'prefix' => $config->beanstalk->prefix,
             ]);
@@ -120,7 +121,7 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
         });
 
         $di->set('view', function () use ($config) {
-            $view = new \Phalcon\Mvc\View\Simple();
+            $view = new Phalcon\Mvc\View\Simple();
             $view->setViewsDir(realpath(dirname(__FILE__)) . '/view/');
 
             $view->registerEngines([
@@ -137,7 +138,7 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
                     return $volt;
                 },
                 '.php' => function ($view, $di) {
-                    return new \Phalcon\Mvc\View\Engine\Php($view, $di);
+                    return new Phalcon\Mvc\View\Engine\Php($view, $di);
                 },
             ]);
 
@@ -183,7 +184,7 @@ abstract class PhalconUnitTestCase extends PhalconTestCase
          * Start the session the first time some component request the session service.
          */
         $di->set('session', function () use ($config) {
-            $memcache = new \Phalcon\Session\Adapter\Memcache([
+            $memcache = new Phalcon\Session\Adapter\Memcache([
                 'host' => $config->memcache->host, // mandatory
                 'post' => $config->memcache->port, // optional (standard: 11211)
                 'lifetime' => 8600, // optional (standard: 8600)

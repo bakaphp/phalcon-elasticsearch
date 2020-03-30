@@ -4,7 +4,7 @@ namespace Baka\Elasticsearch\Contracts;
 
 use Baka\Database\Contracts\CustomFields\CustomFieldsTrait;
 
-class ElasticModelTrait
+trait ElasticModelTrait
 {
     use CustomFieldsTrait;
     

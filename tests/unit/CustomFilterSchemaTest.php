@@ -1,11 +1,11 @@
 <?php
 
+use Baka\Elasticsearch\Contracts\CustomFiltersSchemaTrait;
 use Baka\Elasticsearch\IndexBuilderStructure;
-use Baka\Elasticsearch\Contracts\CustomFiltresSchemaTrait;
 
 class CustomFilterSchemaTest extends PhalconUnitTestCase
 {
-    use CustomFiltresSchemaTrait;
+    use CustomFiltersSchemaTrait;
 
     /**
      * Emulate DI.

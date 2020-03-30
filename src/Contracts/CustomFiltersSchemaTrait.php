@@ -31,7 +31,7 @@ trait CustomFiltersSchemaTrait
         //we only need the info from the property onward
         //we want the result to be in a linear array so we pass it by reference
         $result = [];
-        $results = $this->mappingToArray(array_shift($mapping)['properties'], null, $result);
+        $results = $this->mappingToArray($mapping['properties'], null, $result);
         rsort($results); //revert order?
         return $results;
     }
@@ -52,6 +52,11 @@ trait CustomFiltersSchemaTrait
             } elseif (isset($mapping['type']) && $mapping['type'] == 'nested' && is_array($mapping)) {
                 //setup key
                 $parent .= $key . '.';
+
+                //if we have a bad nested mapping
+                if(!isset($mapping['properties'])){
+                    continue;
+                }
 
                 //look for more records
                 $this->mappingToArray($mapping['properties'], $parent, $result);

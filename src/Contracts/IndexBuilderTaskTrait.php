@@ -43,7 +43,7 @@ trait IndexBuilderTaskTrait
         //for participant u need 500 depth
         list($model, $maxDepth, $nestedLimit) = $params + ['', 3, 75];
 
-        if (!empty($model)) {
+        if (is_object($model)) {
             // Get elasticsearch class handler instance
             $elasticsearch = new IndexBuilder();
 
@@ -68,7 +68,7 @@ trait IndexBuilderTaskTrait
     {
         list($model, $maxDepth) = $params + ['', 3];
 
-        if (!empty($model)) {
+        if (is_object($model)) {
             // Get model's records
             $records = $model::find('is_deleted = 0');
             // Get elasticsearch class handler instance
