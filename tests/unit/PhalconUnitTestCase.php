@@ -5,7 +5,7 @@ use Phalcon\Di;
 use Phalcon\Test\UnitTestCase as PhalconTestCase;
 use Phalcon\Annotations\Adapter\Memcached;
 use Elasticsearch\ClientBuilder;
-use Baka\Auth\Models\Apps;
+use Baka\Database\Apps;
 use Phalcon\Config;
 
 abstract class PhalconUnitTestCase extends PhalconTestCase

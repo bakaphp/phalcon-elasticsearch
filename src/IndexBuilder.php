@@ -150,10 +150,10 @@ class IndexBuilder
                 }
             }
         }
-       
+
         // Get custom fields... fields.
         self::getCustomParams($params['body']['mappings']['properties'], $modelClass);
-       
+
         // Call to get the information from related models.
         self::getRelatedParams($params['body']['mappings']['properties'], $modelClass, $modelClass, 1, $maxDepth);
 
@@ -165,8 +165,6 @@ class IndexBuilder
             self::$client->indices()->delete(['index' => $index]);
         }
 
-      
-        print_r($params); die();
         return self::$client->indices()->create($params);
     }
 
@@ -184,7 +182,7 @@ class IndexBuilder
         self::initialize();
 
         // Start the document we are going to insert by converting the object to an array.
-        $document = ModelCustomFields::getCustomFields($model, true);
+        $document = $model->toFullArray();
 
         // Use reflection to extract necessary information from the object.
         $modelReflection = (new ReflectionClass($model));
@@ -193,7 +191,6 @@ class IndexBuilder
 
         $params = [
             'index' => self::getIndexName($model),
-            'type' => self::getIndexName($model),
             'id' => $model->getId(),
             'body' => $document,
         ];
@@ -214,7 +211,6 @@ class IndexBuilder
 
         $params = [
             'index' => self::getIndexName($model),
-            'type' => self::getIndexName($model),
             'id' => $model->getId(),
         ];
 
@@ -351,7 +347,7 @@ class IndexBuilder
         $modelName = end($modelPath);
         $customFields = CustomFields::getFields($modelName);
 
-        if (!is_null($customFields)) {
+        if (!empty($customFields)) {
             $params['custom_fields'] = ['type' => 'nested'];
 
             foreach ($customFields as $field) {

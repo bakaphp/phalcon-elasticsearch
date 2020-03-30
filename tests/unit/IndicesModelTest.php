@@ -51,8 +51,7 @@ class IndicesModelTest extends PhalconUnitTestCase
 
         $lead = Leads::findFirst();
         $params = [
-            'index' => 'leads',
-            'type' => 'leads',
+            'index' => IndexBuilder::getIndexName($lead),
             'id' => $lead->getId()
         ];
 
@@ -81,8 +80,7 @@ class IndicesModelTest extends PhalconUnitTestCase
         $elasticsearch->indexDocument($lead, 1); //depth
 
         $params = [
-            'index' => 'leads',
-            'type' => 'leads',
+            'index' => IndexBuilder::getIndexName($lead),
             'id' => $lead->getId()
         ];
 
