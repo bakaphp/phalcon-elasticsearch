@@ -18,7 +18,7 @@ class Indices extends Model
     {
         $object = new stdClass();
         $object->id = 1;
-        $this->setId(1);
+        $this->setId($object->id);
 
         $object->description = 'tetada';
         $object->date = '2018-01-01';

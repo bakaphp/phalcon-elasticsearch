@@ -17,7 +17,7 @@ class IndexBuilderStructure extends IndexBuilder
      * @param ModelInterface $model
      * @return void
      */
-    protected static function check(ModelInterface $model): void
+    protected static function checks(ModelInterface $model): void
     {
         if (!method_exists($model, 'document')) {
             throw new Exception('Add the ElasticIndexTrait to your model in order to use this function');
@@ -58,7 +58,7 @@ class IndexBuilderStructure extends IndexBuilder
     {
         // Call the initializer.
         self::initialize();
-        self::check($model);
+        self::checks($model);
 
         $document = $model->document();
 
@@ -66,7 +66,6 @@ class IndexBuilderStructure extends IndexBuilder
 
         $params = [
             'index' => $indexName,
-            'type' => $indexName,
             'id' => $model->getId(),
             'body' => $document,
         ];
@@ -84,13 +83,12 @@ class IndexBuilderStructure extends IndexBuilder
     {
         // Call the initializer.
         self::initialize();
-        self::check($model);
+        self::checks($model);
 
         $indexName = self::getIndexName($model);
 
         $params = [
             'index' => $indexName,
-            'type' => $indexName,
             'id' => $model->getId(),
         ];
 
@@ -136,9 +134,6 @@ class IndexBuilderStructure extends IndexBuilder
             'body' => [
                 'settings' => self::getIndicesSettings($nestedLimit),
                 'mappings' => [
-                    $index => [
-                        'properties' => [],
-                    ],
                 ],
             ],
         ];
@@ -147,19 +142,19 @@ class IndexBuilderStructure extends IndexBuilder
         foreach ($columns as $column => $type) {
             if (is_array($type) && isset($type[0])) {
                 // Remember we used an array to define the types for dates. This is the only case for now.
-                $params['body']['mappings'][$index]['properties'][$column] = [
+                $params['body']['mappings']['properties'][$column] = [
                     'type' => $type[0],
                     'format' => $type[1],
                 ];
             } elseif (!is_array($type)) {
-                $params['body']['mappings'][$index]['properties'][$column] = ['type' => $type];
+                $params['body']['mappings']['properties'][$column] = ['type' => $type];
 
                 if ($type == 'string') {
-                    $params['body']['mappings'][$index]['properties'][$column]['analyzer'] = 'lowercase';
+                    $params['body']['mappings']['properties'][$column]['analyzer'] = 'lowercase';
                 }
             } else {
                 //nested
-                self::mapNestedProperties($params['body']['mappings'][$index]['properties'], $column, $type);
+                self::mapNestedProperties($params['body']['mappings']['properties'], $column, $type);
             }
         }
 
@@ -168,6 +163,7 @@ class IndexBuilderStructure extends IndexBuilder
         if (self::$client->indices()->exists(['index' => $index])) {
             self::$client->indices()->delete(['index' => $index]);
         }
+
         return self::$client->indices()->create($params);
     }
 

@@ -15,7 +15,7 @@ class IndicesTest extends PhalconUnitTestCase
         $elasticsearch = new IndexBuilderStructure();
 
         $indices = new Indices();
-        $elasticsearch::createIndices('Indices');
+        $elasticsearch::createIndices($indices);
     }
 
     /**
@@ -29,7 +29,7 @@ class IndicesTest extends PhalconUnitTestCase
 
         $indices = new Indices();
         $elasticsearch::setIndexName('MyManualIndexName');
-        $elasticsearch::createIndices('Indices');
+        $elasticsearch::createIndices($indices);
     }
 
     /**
@@ -42,7 +42,9 @@ class IndicesTest extends PhalconUnitTestCase
         $elasticsearch = new IndexBuilderStructure();
         $indices = new Indices();
         //$elasticsearch::setIndexName('Indices');
-        $elasticsearch::indexDocument($indices);
+        $results = $elasticsearch::indexDocument($indices);
+        $this->assertTrue(in_array($results['result'], ['updated' , 'created']));
+
     }
 
     /**
@@ -55,7 +57,9 @@ class IndicesTest extends PhalconUnitTestCase
         $elasticsearch = new IndexBuilderStructure();
         $indices = new Indices();
         $elasticsearch::setIndexName('MyManualIndexName');
-        $elasticsearch::indexDocument($indices);
+        $results = $elasticsearch::indexDocument($indices);
+
+        $this->assertTrue(in_array($results['result'], ['updated' , 'created']));
     }
 
     /**
@@ -66,10 +70,11 @@ class IndicesTest extends PhalconUnitTestCase
     public function testDeletetDocumentToIndex()
     {
         $elasticsearch = new IndexBuilderStructure();
+        
         $indices = new Indices();
-        // $elasticsearch::setIndexName('Indices');
-        $elasticsearch::deleteDocument($indices);
-    }
+        $indices->setId(1);
+        $results = $elasticsearch::deleteDocument($indices);
 
-   
+        $this->assertTrue($results['result'] == 'deleted');
+    }
 }
