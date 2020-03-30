@@ -183,12 +183,12 @@ class IndexBuilder
 
         // Start the document we are going to insert by converting the object to an array.
         $document = $model->toFullArray();
+        //$document = ModelCustomFields::getCustomFields($model, true);
 
         // Use reflection to extract necessary information from the object.
         $modelReflection = (new ReflectionClass($model));
 
         self::getRelatedData($document, $model, $modelReflection->name, 1, $maxDepth);
-
         $params = [
             'index' => self::getIndexName($model),
             'id' => $model->getId(),
@@ -348,7 +348,7 @@ class IndexBuilder
         $customFields = CustomFields::getFields($modelName);
 
         if (!empty($customFields)) {
-            $params['custom_fields'] = ['type' => 'nested'];
+            //$params['custom_fields'] = ['type' => 'nested'];
 
             foreach ($customFields as $field) {
                 $type = [
@@ -363,7 +363,8 @@ class IndexBuilder
                     ];
                 }
 
-                $params['custom_fields']['properties'][$field['name']] = $type;
+                //$params['custom_fields']['properties'][$field['name']] = $type;
+                $params[$field['name']] = $type;
             }
         }
     }
@@ -413,7 +414,8 @@ class IndexBuilder
                     $aliasRecords = $data->$alias('is_deleted = 0');
 
                     if ($aliasRecords) {
-                        $document[$aliasKey] = ModelCustomFields::getCustomFields($aliasRecords, true);
+                        $document[$aliasKey] = $aliasRecords->toFullArray();
+                        //$document[$aliasKey] = ModelCustomFields::getCustomFields($aliasRecords, true);
 
                         if ($depth < $maxDepth) {
                             self::getRelatedData($document[$aliasKey], $aliasRecords, $parentModel, $depth, $maxDepth);
@@ -446,7 +448,8 @@ class IndexBuilder
 
                     if (count($aliasRecords) > 0) {
                         foreach ($aliasRecords as $k => $relation) {
-                            $document[$aliasKey][$k] = ModelCustomFields::getCustomFields($relation, true);
+                            $document[$aliasKey][$k] = $relation->toFullArray();
+                            //$document[$aliasKey][$k] = $relation::getCustomFields($relation, true);
 
                             if ($depth < $maxDepth) {
                                 self::getRelatedData($document[$aliasKey][$k], $relation, $parentModel, $depth, $maxDepth);
